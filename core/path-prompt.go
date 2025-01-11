@@ -126,7 +126,7 @@ func (p *PathPrompt) ValueWithCursor() string {
 	if p.CursorIndex >= len(p.Value) {
 		value = p.Value
 		if p.Hint == "" {
-			hint = picocolors.Inverse(" ")
+			hint = "█"
 		} else {
 			hint = picocolors.Inverse(string(p.Hint[0])) + picocolors.Dim(p.Hint[1:])
 		}

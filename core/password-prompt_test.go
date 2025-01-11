@@ -53,11 +53,11 @@ func TestPasswordMask(t *testing.T) {
 func TestPasswordMaskWithCursor(t *testing.T) {
 	p := newPasswordPrompt()
 
-	assert.Equal(t, " ", p.ValueWithMaskAndCursor())
+	assert.Equal(t, "█", p.ValueWithMaskAndCursor())
 	p.PressKey(&core.Key{Char: "a"})
-	assert.Equal(t, "* ", p.ValueWithMaskAndCursor())
+	assert.Equal(t, "*█", p.ValueWithMaskAndCursor())
 	p.PressKey(&core.Key{Char: "b"})
-	assert.Equal(t, "** ", p.ValueWithMaskAndCursor())
+	assert.Equal(t, "**█", p.ValueWithMaskAndCursor())
 	p.PressKey(&core.Key{Name: core.LeftKey})
 	assert.Equal(t, "**", p.ValueWithMaskAndCursor())
 	p.PressKey(&core.Key{Name: core.BackspaceKey})

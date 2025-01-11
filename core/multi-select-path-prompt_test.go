@@ -175,9 +175,9 @@ func TestMultiSelectPathFilterNavigate(t *testing.T) {
 
 func TestMultiSelectPathFilterRecover(t *testing.T) {
 	p := core.NewMultiSelectPathPrompt(core.MultiSelectPathPromptParams{
-		Filter: true,
+		Filter:     true,
 		FileSystem: MockFileSystem{},
-		Render: func(p *core.MultiSelectPathPrompt) string { return "" },
+		Render:     func(p *core.MultiSelectPathPrompt) string { return "" },
 	})
 
 	assert.Equal(t, 3, len(p.Options()))

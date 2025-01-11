@@ -39,29 +39,29 @@ func TestApplyThemeInitialState(t *testing.T) {
 		},
 		{
 			Description:     "InitialStateWithValue",
-			ValueWithCursor: "Value with cursor ",
+			ValueWithCursor: "Value with cursor█",
 			Expected: strings.Join([]string{
 				symbols.BAR,
 				symbols.STEP_ACTIVE + " Test message",
-				symbols.BAR + " Value with cursor ",
+				symbols.BAR + " Value with cursor█",
 				symbols.BAR_END,
 			}, "\r\n"),
 		},
 		{
 			Description:     "InitialStateWithPlaceholderAndValue",
 			Placeholder:     "Placeholder",
-			ValueWithCursor: "Value with cursor ",
+			ValueWithCursor: "Value with cursor█",
 			Expected: strings.Join([]string{
 				symbols.BAR,
 				symbols.STEP_ACTIVE + " Test message",
-				symbols.BAR + " Value with cursor ",
+				symbols.BAR + " Value with cursor█",
 				symbols.BAR_END,
 			}, "\r\n"),
 		},
 		{
 			Description:     "InitialStateWithPlaceholderAndCursor",
 			Placeholder:     "Placeholder",
-			ValueWithCursor: " ",
+			ValueWithCursor: "█",
 			Expected: strings.Join([]string{
 				symbols.BAR,
 				symbols.STEP_ACTIVE + " Test message",

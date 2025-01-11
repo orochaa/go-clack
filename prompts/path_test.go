@@ -31,7 +31,7 @@ func TestPathInitialStateWithInitialValue(t *testing.T) {
 
 	p := test.PathTestingPrompt
 	title := symbols.State(core.InitialState) + " " + message
-	valueWithCursor := symbols.BAR + " /foo "
+	valueWithCursor := symbols.BAR + " /foo█"
 	expected := strings.Join([]string{symbols.BAR, title, valueWithCursor, symbols.BAR_END}, "\r\n")
 	assert.Equal(t, core.InitialState, p.State)
 	assert.Equal(t, expected, p.Frame)
@@ -47,7 +47,7 @@ func TestPathErrorState(t *testing.T) {
 	p.PressKey(&core.Key{Name: core.EnterKey})
 
 	title := symbols.State(core.ErrorState) + " " + message
-	valueWithCursor := symbols.BAR + " /foo "
+	valueWithCursor := symbols.BAR + " /foo█"
 	err := symbols.BAR_END + " invalid value: /foo"
 	expected := strings.Join([]string{symbols.BAR, title, valueWithCursor, err}, "\r\n")
 	assert.Equal(t, core.ErrorState, p.State)

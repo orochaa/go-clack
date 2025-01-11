@@ -44,7 +44,7 @@ func TestTextPromptValueTrack(t *testing.T) {
 
 func TestTextPromptValueWithCursor(t *testing.T) {
 	p := newTextPrompt()
-	cursor := picocolors.Inverse(" ")
+	cursor := "█"
 
 	expected := cursor
 	assert.Equal(t, expected, p.ValueWithCursor())

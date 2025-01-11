@@ -39,7 +39,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 	}, "\r\n")
 
 	var valueWithCursor string
-	if params.Placeholder != "" && (params.ValueWithCursor == "" || (ctx.State == core.InitialState && params.ValueWithCursor == " ")) {
+	if params.Placeholder != "" && (params.ValueWithCursor == "" || (ctx.State == core.InitialState && params.ValueWithCursor == "█")) {
 		valueWithCursor = picocolors.Inverse(string(params.Placeholder[0])) + picocolors.Dim(params.Placeholder[1:])
 	} else {
 		valueWithCursor = params.ValueWithCursor

@@ -19,7 +19,7 @@ func TestPasswordInitialState(t *testing.T) {
 
 	p := test.PasswordTestingPrompt
 	title := symbols.State(core.InitialState) + " " + message
-	valueWithCursor := symbols.BAR + " "
+	valueWithCursor := symbols.BAR + " █"
 	expected := strings.Join([]string{symbols.BAR, title, valueWithCursor, symbols.BAR_END}, "\r\n")
 	assert.Equal(t, core.InitialState, p.State)
 	assert.Equal(t, expected, p.Frame)
@@ -31,7 +31,7 @@ func TestPasswordInitialStateWithInitialValue(t *testing.T) {
 
 	p := test.PasswordTestingPrompt
 	title := symbols.State(core.InitialState) + " " + message
-	valueWithCursor := symbols.BAR + " *** "
+	valueWithCursor := symbols.BAR + " ***█"
 	expected := strings.Join([]string{symbols.BAR, title, valueWithCursor, symbols.BAR_END}, "\r\n")
 	assert.Equal(t, core.InitialState, p.State)
 	assert.Equal(t, expected, p.Frame)
@@ -47,7 +47,7 @@ func TestPasswordErrorState(t *testing.T) {
 	p.PressKey(&core.Key{Name: core.EnterKey})
 
 	title := symbols.State(core.ErrorState) + " " + message
-	valueWithCursor := symbols.BAR + " *** "
+	valueWithCursor := symbols.BAR + " ***█"
 	err := symbols.BAR_END + " invalid value: foo"
 	expected := strings.Join([]string{symbols.BAR, title, valueWithCursor, err}, "\r\n")
 	assert.Equal(t, core.ErrorState, p.State)

@@ -60,7 +60,7 @@ func (p *TextPrompt) handleKeyPress(key *Key) {
 
 func (p *TextPrompt) ValueWithCursor() string {
 	if p.CursorIndex == len(p.Value) {
-		return p.Value + picocolors.Inverse(" ")
+		return p.Value + "█"
 	}
 	return p.Value[0:p.CursorIndex] + picocolors.Inverse(string(p.Value[p.CursorIndex])) + p.Value[p.CursorIndex+1:]
 }

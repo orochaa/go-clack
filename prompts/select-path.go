@@ -59,7 +59,7 @@ func SelectPath(params SelectPathParams) (string, error) {
 					if p.Search == "" {
 						message = fmt.Sprintf("%s\n> %s", message, picocolors.Inverse("T")+picocolors.Dim("ype to filter..."))
 					} else {
-						message = fmt.Sprintf("%s\n> %s", message, p.Search+picocolors.Inverse(" "))
+						message = fmt.Sprintf("%s\n> %s", message, p.Search+"█")
 					}
 
 					value = p.LimitLines(radioOptions, 4)

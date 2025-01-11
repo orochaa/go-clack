@@ -11,6 +11,7 @@ import (
 
 func TestStrLength(t *testing.T) {
 	assert.Equal(t, 1, utils.StrLength(picocolors.Inverse(" ")))
+	assert.Equal(t, 1, utils.StrLength(picocolors.Inverse("█")))
 	assert.Equal(t, 5, utils.StrLength(picocolors.Cyan("| foo")))
 	assert.Equal(t, 5, utils.StrLength(picocolors.Gray("|")+" "+picocolors.Dim("foo")))
 	assert.Equal(t, 1, utils.StrLength(picocolors.Green("◆")))

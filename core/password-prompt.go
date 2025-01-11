@@ -53,7 +53,7 @@ func (p *PasswordPrompt) ValueWithMask() string {
 func (p *PasswordPrompt) ValueWithMaskAndCursor() string {
 	maskedValue := strings.Repeat("*", len(p.Value))
 	if p.CursorIndex == len(p.Value) {
-		return maskedValue + picocolors.Inverse(" ")
+		return maskedValue + "█"
 	}
 	return maskedValue[0:p.CursorIndex] + picocolors.Inverse(string(maskedValue[p.CursorIndex])) + maskedValue[p.CursorIndex+1:]
 }

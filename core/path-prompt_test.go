@@ -97,7 +97,7 @@ func TestPathValueWithHint(t *testing.T) {
 
 	p.Hint = ""
 	p.CursorIndex = len(p.Value)
-	assert.Equal(t, p.Value+" ", p.ValueWithCursor())
+	assert.Equal(t, p.Value+"█", p.ValueWithCursor())
 
 	p.Hint = ""
 	p.CursorIndex = len(p.Value) - 1
