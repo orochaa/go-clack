@@ -62,12 +62,21 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 		frameInterval = 120
 	}
 
+	isCI := os.Getenv("CI") == "true"
+
 	write := func(str string) {
 		options.Output.Write([]byte(str))
 	}
 
 	clearPrevMessage := func() {
-		write(sisteransi.MoveCursor(-len(strings.Split(prevMessage, "\n"))+1, -999))
+		if prevMessage == "" {
+			return
+		}
+		if isCI {
+			write("\n")
+		}
+		prevLines := strings.Split(prevMessage, "\n")
+		write(sisteransi.MoveCursor(-len(prevLines)+1, -999))
 		write(sisteransi.EraseDown())
 	}
 
@@ -86,10 +95,18 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 					case <-done:
 						return
 					default:
+						if isCI && message == prevMessage {
+							continue
+						}
 						clearPrevMessage()
 						prevMessage = message
 						frame := picocolors.Magenta(frames[frameIndex])
-						loadingDots := strings.Repeat(".", min(int(math.Floor(float64(dotsTimer))), 3))
+						var loadingDots string
+						if isCI {
+							loadingDots = "..."
+						} else {
+							loadingDots = strings.Repeat(".", min(int(math.Floor(float64(dotsTimer))), 3))
+						}
 						write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
 						if frameIndex+1 < len(frames) {
 							frameIndex++

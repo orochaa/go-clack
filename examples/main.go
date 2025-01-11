@@ -20,6 +20,7 @@ func main() {
 			{Label: "basic"},
 			{Label: "changeset"},
 			{Label: "spinner"},
+			{Label: "spinner-ci"},
 			{Label: "async validation"},
 		},
 	})
@@ -35,6 +36,9 @@ func main() {
 		ChangesetExample()
 	case "spinner":
 		SpinnerExample()
+	case "spinner-ci":
+		os.Setenv("CI", "true")
+		SpinnerCIExample()
 	case "async validation":
 		AsyncValidation()
 	default:

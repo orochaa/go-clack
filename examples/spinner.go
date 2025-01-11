@@ -11,7 +11,7 @@ func SpinnerExample() {
 	prompts.Intro("spinner start...")
 
 	s := prompts.Spinner(prompts.SpinnerOptions{})
-	total := 10000
+	total := 6000
 	progress := 0
 
 	s.Start("")
