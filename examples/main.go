@@ -23,6 +23,7 @@ func main() {
 			{Label: "spinner-ci"},
 			{Label: "async-validation"},
 			{Label: "file-selection"},
+			{Label: "custom-keys"},
 		},
 	})
 	if err != nil {
@@ -43,6 +44,8 @@ func main() {
 		AsyncValidation()
 	case "file-selection":
 		FileSelection()
+	case "custom-keys":
+		CustomKeys()
 	default:
 		prompts.Error("example not found")
 	}
