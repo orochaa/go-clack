@@ -53,9 +53,14 @@ func NewConfirmPrompt(params ConfirmPromptParams) *ConfirmPrompt {
 }
 
 func (p *ConfirmPrompt) handleKeyPress(key *Key) {
-	switch key.Name {
-	case UpKey, DownKey, LeftKey, RightKey:
+	toggleValue := func() {
 		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, 2)
 		p.Value = !p.Value
 	}
+	HandleKeyAction(key, map[Action]func(){
+		UpAction:    toggleValue,
+		DownAction:  toggleValue,
+		LeftAction:  toggleValue,
+		RightAction: toggleValue,
+	})
 }

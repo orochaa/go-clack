@@ -64,24 +64,21 @@ func NewGroupMultiSelectPrompt[TValue comparable](params GroupMultiSelectPromptP
 }
 
 func (p *GroupMultiSelectPrompt[TValue]) handleKeyPress(key *Key) {
-	switch key.Name {
-	case UpKey, LeftKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex-1, len(p.Options))
+	moveCursor := func(direction int) {
+		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 		if p.DisabledGroups && p.Options[p.CursorIndex].IsGroup {
-			p.CursorIndex = utils.MinMaxIndex(p.CursorIndex-1, len(p.Options))
+			p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 		}
-	case DownKey, RightKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, len(p.Options))
-		if p.DisabledGroups && p.Options[p.CursorIndex].IsGroup {
-			p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, len(p.Options))
-		}
-	case HomeKey:
-		p.CursorIndex = 0
-	case EndKey:
-		p.CursorIndex = len(p.Options) - 1
-	case SpaceKey:
-		p.toggleOption()
 	}
+	HandleKeyAction(key, map[Action]func(){
+		UpAction:    func() { moveCursor(-1) },
+		DownAction:  func() { moveCursor(1) },
+		LeftAction:  func() { moveCursor(-1) },
+		RightAction: func() { moveCursor(1) },
+		HomeAction:  func() { p.CursorIndex = 0 },
+		EndAction:   func() { p.CursorIndex = len(p.Options) - 1 },
+		SpaceAction: p.toggleOption,
+	})
 }
 
 func (p *GroupMultiSelectPrompt[TValue]) IsGroupSelected(group *GroupMultiSelectOption[TValue]) bool {

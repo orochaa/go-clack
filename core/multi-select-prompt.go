@@ -68,46 +68,46 @@ func NewMultiSelectPrompt[TValue comparable](params MultiSelectPromptParams[TVal
 }
 
 func (p *MultiSelectPrompt[TValue]) handleKeyPress(key *Key) {
-	switch key.Name {
-	case UpKey, LeftKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex-1, len(p.Options))
-	case DownKey, RightKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, len(p.Options))
-	case HomeKey:
-		p.CursorIndex = 0
-	case EndKey:
-		p.CursorIndex = len(p.Options) - 1
-	case SpaceKey:
-		if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
-			option := p.Options[p.CursorIndex]
-			if option.IsSelected {
-				option.IsSelected = false
-				value := []TValue{}
-				for _, v := range p.Value {
-					if v != option.Value {
-						value = append(value, v)
-					}
-				}
-				p.Value = value
-				return
-			}
-
-			option.IsSelected = true
-			p.Value = append(p.Value, option.Value)
-		}
-	case "a":
-		if p.Filter {
-			p.filterOptions(key)
-			return
-		}
-
-		p.selectAll()
-	case EnterKey, CancelKey:
-	default:
-		if p.Filter {
-			p.filterOptions(key)
-		}
+	moveCursor := func(direction int) {
+		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 	}
+
+	HandleKeyAction(key, map[Action]func(){
+		UpAction:    func() { moveCursor(-1) },
+		DownAction:  func() { moveCursor(1) },
+		LeftAction:  func() { moveCursor(-1) },
+		RightAction: func() { moveCursor(1) },
+		HomeAction:  func() { p.CursorIndex = 0 },
+		EndAction:   func() { p.CursorIndex = len(p.Options) - 1 },
+		SpaceAction: func() {
+			if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
+				option := p.Options[p.CursorIndex]
+				if option.IsSelected {
+					option.IsSelected = false
+					value := []TValue{}
+					for _, v := range p.Value {
+						if v != option.Value {
+							value = append(value, v)
+						}
+					}
+					p.Value = value
+					return
+				}
+
+				option.IsSelected = true
+				p.Value = append(p.Value, option.Value)
+			}
+		},
+		SubmitAction: nil,
+		CancelAction: nil,
+		DefaultAction: func() {
+			if p.Filter {
+				p.filterOptions(key)
+			} else if key.Name == "a" {
+				p.selectAll()
+			}
+		},
+	})
 }
 
 func (p *MultiSelectPrompt[TValue]) selectAll() {

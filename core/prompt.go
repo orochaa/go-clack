@@ -96,17 +96,18 @@ type Key struct {
 }
 
 const (
-	EnterKey     KeyName = "Enter"
-	SpaceKey     KeyName = "Space"
-	TabKey       KeyName = "Tab"
 	UpKey        KeyName = "Up"
 	DownKey      KeyName = "Down"
 	LeftKey      KeyName = "Left"
 	RightKey     KeyName = "Right"
-	CancelKey    KeyName = "Cancel"
 	HomeKey      KeyName = "Home"
 	EndKey       KeyName = "End"
+	SpaceKey     KeyName = "Space"
+	EnterKey     KeyName = "Enter"
+	CancelKey    KeyName = "Cancel"
+	TabKey       KeyName = "Tab"
 	BackspaceKey KeyName = "Backspace"
+	EscapeKey    KeyName = "Escape"
 )
 
 // ParseKey parses a rune into a Key.
@@ -124,34 +125,47 @@ func (p *Prompt[TValue]) ParseKey(r rune) *Key {
 	case 3:
 		return &Key{Name: CancelKey}
 	case 27:
-		next, err := p.rl.Peek(2)
-		if err == nil && len(next) == 2 && next[0] == '[' {
-			switch next[1] {
-			case 'A':
-				p.rl.Discard(2)
-				return &Key{Name: UpKey}
-			case 'B':
-				p.rl.Discard(2)
-				return &Key{Name: DownKey}
-			case 'C':
-				p.rl.Discard(2)
-				return &Key{Name: RightKey}
-			case 'D':
-				p.rl.Discard(2)
-				return &Key{Name: LeftKey}
-			case 'H':
-				p.rl.Discard(2)
-				return &Key{Name: HomeKey}
-			case 'F':
-				p.rl.Discard(2)
-				return &Key{Name: EndKey}
+		readerReady := make(chan bool, 1)
+		go func() {
+			_, err := p.rl.Peek(2)
+			readerReady <- err == nil
+		}()
+
+		select {
+		case ready := <-readerReady:
+			if ready {
+				next, err := p.rl.Peek(2)
+				if err == nil && len(next) == 2 && next[0] == '[' {
+					p.rl.ReadByte() // Consume '['
+					thirdByte, _ := p.rl.ReadByte()
+
+					switch thirdByte {
+					case 'A':
+						return &Key{Name: UpKey}
+					case 'B':
+						return &Key{Name: DownKey}
+					case 'C':
+						return &Key{Name: RightKey}
+					case 'D':
+						return &Key{Name: LeftKey}
+					case 'H':
+						return &Key{Name: HomeKey}
+					case 'F':
+						return &Key{Name: EndKey}
+					}
+				}
+				return &Key{}
+			} else {
+				return &Key{Name: EscapeKey}
 			}
+
+		case <-time.After(50 * time.Millisecond):
+			return &Key{Name: EscapeKey}
 		}
-		return &Key{}
-	default:
-		char := string(r)
-		return &Key{Char: char, Name: KeyName(char)}
 	}
+
+	char := string(r)
+	return &Key{Char: char, Name: KeyName(char)}
 }
 
 // PressKey handles key press events and updates the state of the prompt.
@@ -162,16 +176,19 @@ func (p *Prompt[TValue]) PressKey(key *Key) {
 
 	p.Emit(KeyEvent, key)
 
-	if key.Name == EnterKey {
-		if err := p.validate(); err != nil {
-			p.State = ErrorState
-			p.Error = err.Error()
-		} else {
-			p.State = SubmitState
-		}
-	} else if key.Name == CancelKey {
-		p.State = CancelState
-	}
+	HandleKeyAction(key, map[Action]func(){
+		SubmitAction: func() {
+			if err := p.validate(); err != nil {
+				p.State = ErrorState
+				p.Error = err.Error()
+			} else {
+				p.State = SubmitState
+			}
+		},
+		CancelAction: func() {
+			p.State = CancelState
+		},
+	})
 
 	if p.State == SubmitState || p.State == CancelState {
 		p.Emit(FinalizeEvent)

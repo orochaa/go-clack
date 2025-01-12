@@ -71,21 +71,25 @@ func NewSelectPrompt[TValue comparable](params SelectPromptParams[TValue]) *Sele
 }
 
 func (p *SelectPrompt[TValue]) handleKeyPress(key *Key) {
-	switch key.Name {
-	case UpKey, LeftKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex-1, len(p.Options))
-	case DownKey, RightKey:
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, len(p.Options))
-	case HomeKey:
-		p.CursorIndex = 0
-	case EndKey:
-		p.CursorIndex = len(p.Options) - 1
-	case EnterKey, CancelKey:
-	default:
-		if p.Filter {
-			p.filterOptions(key)
-		}
+	moveCursor := func(direction int) {
+		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 	}
+
+	HandleKeyAction(key, map[Action]func(){
+		UpAction:     func() { moveCursor(-1) },
+		DownAction:   func() { moveCursor(1) },
+		LeftAction:   func() { moveCursor(-1) },
+		RightAction:  func() { moveCursor(1) },
+		HomeAction:   func() { p.CursorIndex = 0 },
+		EndAction:    func() { p.CursorIndex = len(p.Options) - 1 },
+		SubmitAction: nil,
+		CancelAction: nil,
+		DefaultAction: func() {
+			if p.Filter {
+				p.filterOptions(key)
+			}
+		},
+	})
 
 	if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
 		p.Value = p.Options[p.CursorIndex].Value
