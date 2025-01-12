@@ -21,14 +21,14 @@ func main() {
 			{Label: "changeset"},
 			{Label: "spinner"},
 			{Label: "spinner-ci"},
-			{Label: "async validation"},
+			{Label: "async-validation"},
+			{Label: "file-selection"},
 		},
 	})
 	if err != nil {
 		return
 	}
 
-	print("\n")
 	switch prompt {
 	case "basic":
 		BasicExample()
@@ -39,8 +39,10 @@ func main() {
 	case "spinner-ci":
 		os.Setenv("CI", "true")
 		SpinnerCIExample()
-	case "async validation":
+	case "async-validation":
 		AsyncValidation()
+	case "file-selection":
+		FileSelection()
 	default:
 		prompts.Error("example not found")
 	}

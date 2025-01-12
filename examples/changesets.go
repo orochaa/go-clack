@@ -36,6 +36,7 @@ func ChangesetExample() {
 						{Label: "@scope/z"},
 					},
 				},
+				Required: true,
 			})
 		}).
 		Step("major", func() (any, error) {
