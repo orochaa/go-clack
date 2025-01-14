@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/Mist3rBru/go-clack/core"
@@ -18,6 +19,7 @@ type SelectOption[TValue comparable] struct {
 }
 
 type SelectParams[TValue comparable] struct {
+	Context      context.Context
 	Message      string
 	InitialValue TValue
 	Options      []*SelectOption[TValue]
@@ -38,6 +40,7 @@ func Select[TValue comparable](params SelectParams[TValue]) (TValue, error) {
 	}
 
 	p := core.NewSelectPrompt(core.SelectPromptParams[TValue]{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		Options:      options,
 		Filter:       params.Filter,

@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"regexp"
 
@@ -23,6 +24,7 @@ type SelectPrompt[TValue comparable] struct {
 }
 
 type SelectPromptParams[TValue comparable] struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue TValue
@@ -50,6 +52,7 @@ func NewSelectPrompt[TValue comparable](params SelectPromptParams[TValue]) *Sele
 	var p SelectPrompt[TValue]
 	p = SelectPrompt[TValue]{
 		Prompt: *NewPrompt(PromptParams[TValue]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: params.Options[startIndex].Value,

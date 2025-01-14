@@ -23,6 +23,7 @@ func main() {
 			{Label: "spinner-ci"},
 			{Label: "async-validation"},
 			{Label: "file-selection"},
+			{Label: "race-condition"},
 			{Label: "custom-keys"},
 		},
 	})
@@ -44,6 +45,8 @@ func main() {
 		AsyncValidation()
 	case "file-selection":
 		FileSelection()
+	case "race-condition":
+		RaceCondition()
 	case "custom-keys":
 		CustomKeys()
 	default:

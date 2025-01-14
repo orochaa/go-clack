@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 
 	"github.com/Mist3rBru/go-clack/core/validator"
@@ -18,6 +19,7 @@ type SelectKeyPrompt[TValue any] struct {
 }
 
 type SelectKeyPromptParams[TValue any] struct {
+	Context context.Context
 	Input   *os.File
 	Output  *os.File
 	Options []*SelectKeyOption[TValue]
@@ -38,9 +40,10 @@ func NewSelectKeyPrompt[TValue any](params SelectKeyPromptParams[TValue]) *Selec
 	var p SelectKeyPrompt[TValue]
 	p = SelectKeyPrompt[TValue]{
 		Prompt: *NewPrompt(PromptParams[TValue]{
-			Input:  params.Input,
-			Output: params.Output,
-			Render: WrapRender[TValue](&p, params.Render),
+			Context: params.Context,
+			Input:   params.Input,
+			Output:  params.Output,
+			Render:  WrapRender[TValue](&p, params.Render),
 		}),
 		Options: params.Options,
 	}

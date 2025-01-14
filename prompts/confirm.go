@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"strings"
 
 	"github.com/Mist3rBru/go-clack/core"
@@ -11,6 +12,7 @@ import (
 )
 
 type ConfirmParams struct {
+	Context      context.Context
 	Message      string
 	InitialValue bool
 	Active       string
@@ -19,6 +21,7 @@ type ConfirmParams struct {
 
 func Confirm(params ConfirmParams) (bool, error) {
 	p := core.NewConfirmPrompt(core.ConfirmPromptParams{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		Active:       params.Active,
 		Inactive:     params.Inactive,

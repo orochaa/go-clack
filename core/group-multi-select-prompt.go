@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 
 	"github.com/Mist3rBru/go-clack/core/utils"
@@ -21,6 +22,7 @@ type GroupMultiSelectPrompt[TValue comparable] struct {
 }
 
 type GroupMultiSelectPromptParams[TValue comparable] struct {
+	Context        context.Context
 	Input          *os.File
 	Output         *os.File
 	Options        map[string][]MultiSelectOption[TValue]
@@ -41,6 +43,7 @@ func NewGroupMultiSelectPrompt[TValue comparable](params GroupMultiSelectPromptP
 	var p GroupMultiSelectPrompt[TValue]
 	p = GroupMultiSelectPrompt[TValue]{
 		Prompt: *NewPrompt(PromptParams[[]TValue]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: mapGroupMultiSelectInitialValue(params.InitialValue, options),

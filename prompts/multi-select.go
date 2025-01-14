@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -20,6 +21,7 @@ type MultiSelectOption[TValue comparable] struct {
 }
 
 type MultiSelectParams[TValue comparable] struct {
+	Context      context.Context
 	Message      string
 	Options      []*MultiSelectOption[TValue]
 	InitialValue []TValue
@@ -42,6 +44,7 @@ func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue,
 	}
 
 	p := core.NewMultiSelectPrompt(core.MultiSelectPromptParams[TValue]{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		Options:      options,
 		Filter:       params.Filter,

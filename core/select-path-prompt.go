@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"path"
 
@@ -21,6 +22,7 @@ type SelectPathPrompt struct {
 }
 
 type SelectPathPromptParams struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue string
@@ -41,6 +43,7 @@ func NewSelectPathPrompt(params SelectPathPromptParams) *SelectPathPrompt {
 	var p SelectPathPrompt
 	p = SelectPathPrompt{
 		Prompt: *NewPrompt(PromptParams[string]{
+			Context:     params.Context,
 			Input:       params.Input,
 			Output:      params.Output,
 			CursorIndex: 1,

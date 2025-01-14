@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 
 	"github.com/Mist3rBru/go-clack/core/validator"
@@ -14,6 +15,7 @@ type TextPrompt struct {
 }
 
 type TextPromptParams struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue string
@@ -30,6 +32,7 @@ func NewTextPrompt(params TextPromptParams) *TextPrompt {
 	var p TextPrompt
 	p = TextPrompt{
 		Prompt: *NewPrompt(PromptParams[string]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: params.InitialValue,

@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -12,6 +13,7 @@ import (
 )
 
 type MultiSelectPathParams struct {
+	Context      context.Context
 	Message      string
 	InitialValue []string
 	InitialPath  string
@@ -24,6 +26,7 @@ type MultiSelectPathParams struct {
 
 func MultiSelectPath(params MultiSelectPathParams) ([]string, error) {
 	p := core.NewMultiSelectPathPrompt(core.MultiSelectPathPromptParams{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		InitialPath:  params.InitialPath,
 		OnlyShowDir:  params.OnlyShowDir,

@@ -2,6 +2,7 @@ package core
 
 import (
 	"bufio"
+	"context"
 	"flag"
 	"os"
 	"strings"
@@ -31,6 +32,7 @@ const (
 )
 
 type Prompt[TValue any] struct {
+	context   context.Context
 	listeners map[Event][]EventListener
 
 	rl     *bufio.Reader
@@ -51,6 +53,7 @@ type Prompt[TValue any] struct {
 }
 
 type PromptParams[TValue any] struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue TValue
@@ -63,6 +66,9 @@ func NewPrompt[TValue any](params PromptParams[TValue]) *Prompt[TValue] {
 	v := validator.NewValidator("Prompt")
 	v.ValidateRender(params.Render)
 
+	if params.Context == nil {
+		params.Context = context.Background()
+	}
 	if params.Input == nil {
 		params.Input = os.Stdin
 	}
@@ -71,6 +77,7 @@ func NewPrompt[TValue any](params PromptParams[TValue]) *Prompt[TValue] {
 	}
 
 	return &Prompt[TValue]{
+		context:   params.Context,
 		listeners: make(map[Event][]EventListener),
 
 		input:  params.Input,
@@ -303,6 +310,15 @@ func (p *Prompt[TValue]) Run() (TValue, error) {
 	p.Once(CancelEvent, closeCb)
 
 	p.render()
+
+	go func() {
+		select {
+		case <-done:
+			return
+		case <-p.context.Done():
+			p.PressKey(&Key{Name: CancelKey})
+		}
+	}()
 
 outer:
 	for {

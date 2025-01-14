@@ -1,6 +1,8 @@
 package prompts
 
 import (
+	"context"
+
 	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/prompts/test"
 	"github.com/Mist3rBru/go-clack/prompts/theme"
@@ -8,6 +10,7 @@ import (
 )
 
 type PathParams struct {
+	Context      context.Context
 	Message      string
 	InitialValue string
 	OnlyShowDir  bool
@@ -17,6 +20,7 @@ type PathParams struct {
 
 func Path(params PathParams) (string, error) {
 	p := core.NewPathPrompt(core.PathPromptParams{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		OnlyShowDir:  params.OnlyShowDir,
 		Required:     params.Required,

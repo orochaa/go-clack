@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"strings"
 
@@ -14,6 +15,7 @@ type PasswordPrompt struct {
 }
 
 type PasswordPromptParams struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue string
@@ -29,6 +31,7 @@ func NewPasswordPrompt(params PasswordPromptParams) *PasswordPrompt {
 	var p PasswordPrompt
 	p = PasswordPrompt{
 		Prompt: *NewPrompt(PromptParams[string]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: params.InitialValue,

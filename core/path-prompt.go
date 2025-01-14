@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"regexp"
 	"strings"
@@ -22,6 +23,7 @@ type PathPrompt struct {
 }
 
 type PathPromptParams struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue string
@@ -43,6 +45,7 @@ func NewPathPrompt(params PathPromptParams) *PathPrompt {
 	var p PathPrompt
 	p = PathPrompt{
 		Prompt: *NewPrompt(PromptParams[string]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: params.InitialValue,

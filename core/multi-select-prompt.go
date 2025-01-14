@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"regexp"
 
@@ -24,6 +25,7 @@ type MultiSelectPrompt[TValue comparable] struct {
 }
 
 type MultiSelectPromptParams[TValue comparable] struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue []TValue
@@ -48,6 +50,7 @@ func NewMultiSelectPrompt[TValue comparable](params MultiSelectPromptParams[TVal
 	var p MultiSelectPrompt[TValue]
 	p = MultiSelectPrompt[TValue]{
 		Prompt: *NewPrompt(PromptParams[[]TValue]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: mapMultiSelectInitialValue(params.InitialValue, params.Options),

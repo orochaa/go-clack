@@ -1,6 +1,7 @@
 package core
 
 import (
+	"context"
 	"os"
 	"path"
 	"sort"
@@ -22,6 +23,7 @@ type MultiSelectPathPrompt struct {
 }
 
 type MultiSelectPathPromptParams struct {
+	Context      context.Context
 	Input        *os.File
 	Output       *os.File
 	InitialValue []string
@@ -45,6 +47,7 @@ func NewMultiSelectPathPrompt(params MultiSelectPathPromptParams) *MultiSelectPa
 	var p MultiSelectPathPrompt
 	p = MultiSelectPathPrompt{
 		Prompt: *NewPrompt(PromptParams[[]string]{
+			Context:      params.Context,
 			Input:        params.Input,
 			Output:       params.Output,
 			InitialValue: params.InitialValue,

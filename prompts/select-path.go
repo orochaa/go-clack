@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"fmt"
 	"strings"
 
@@ -14,6 +15,7 @@ import (
 type FileSystem = core.FileSystem
 
 type SelectPathParams struct {
+	Context      context.Context
 	Message      string
 	InitialValue string
 	OnlyShowDir  bool
@@ -23,6 +25,7 @@ type SelectPathParams struct {
 
 func SelectPath(params SelectPathParams) (string, error) {
 	p := core.NewSelectPathPrompt(core.SelectPathPromptParams{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		OnlyShowDir:  params.OnlyShowDir,
 		Filter:       params.Filter,

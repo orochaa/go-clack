@@ -1,12 +1,15 @@
 package prompts
 
 import (
+	"context"
+
 	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/prompts/test"
 	"github.com/Mist3rBru/go-clack/prompts/theme"
 )
 
 type PasswordParams struct {
+	Context      context.Context
 	Message      string
 	InitialValue string
 	Required     bool
@@ -15,6 +18,7 @@ type PasswordParams struct {
 
 func Password(params PasswordParams) (string, error) {
 	p := core.NewPasswordPrompt(core.PasswordPromptParams{
+		Context:      params.Context,
 		InitialValue: params.InitialValue,
 		Required:     params.Required,
 		Validate:     params.Validate,

@@ -1,6 +1,8 @@
 package prompts
 
 import (
+	"context"
+
 	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/core/validator"
 	"github.com/Mist3rBru/go-clack/prompts/symbols"
@@ -10,6 +12,7 @@ import (
 )
 
 type GroupMultiSelectParams[TValue comparable] struct {
+	Context        context.Context
 	Message        string
 	Options        map[string][]MultiSelectOption[TValue]
 	InitialValue   []TValue
@@ -36,6 +39,7 @@ func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) 
 	}
 
 	p := core.NewGroupMultiSelectPrompt(core.GroupMultiSelectPromptParams[TValue]{
+		Context:        params.Context,
 		InitialValue:   params.InitialValue,
 		Options:        groups,
 		DisabledGroups: params.DisabledGroups,
