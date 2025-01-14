@@ -31,7 +31,7 @@ const (
 )
 
 type Prompt[TValue any] struct {
-	listeners map[Event][]Listener
+	listeners map[Event][]EventListener
 
 	rl     *bufio.Reader
 	input  *os.File
@@ -71,7 +71,7 @@ func NewPrompt[TValue any](params PromptParams[TValue]) *Prompt[TValue] {
 	}
 
 	return &Prompt[TValue]{
-		listeners: make(map[Event][]Listener),
+		listeners: make(map[Event][]EventListener),
 
 		input:  params.Input,
 		output: params.Output,
@@ -176,19 +176,18 @@ func (p *Prompt[TValue]) PressKey(key *Key) {
 
 	p.Emit(KeyEvent, key)
 
-	HandleKeyAction(key, map[Action]func(){
-		SubmitAction: func() {
+	if action, actionExists := aliases[key.Name]; actionExists {
+		if action == SubmitAction {
 			if err := p.validate(); err != nil {
 				p.State = ErrorState
 				p.Error = err.Error()
 			} else {
 				p.State = SubmitState
 			}
-		},
-		CancelAction: func() {
+		} else if action == CancelAction {
 			p.State = CancelState
-		},
-	})
+		}
+	}
 
 	if p.State == SubmitState || p.State == CancelState {
 		p.Emit(FinalizeEvent)

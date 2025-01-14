@@ -2,6 +2,7 @@ package core
 
 import "fmt"
 
+// Event represents the type of events that can occur.
 type Event int
 
 const (
@@ -19,16 +20,16 @@ const (
 	SubmitEvent
 )
 
-type Listener func(args ...any)
+type EventListener func(args ...any)
 
 // On registers a listener for the specified event.
-func (p *Prompt[TValue]) On(event Event, listener Listener) {
+func (p *Prompt[TValue]) On(event Event, listener EventListener) {
 	p.listeners[event] = append(p.listeners[event], listener)
 }
 
 // Once registers a one-time listener for the specified event.
-func (p *Prompt[TValue]) Once(event Event, listener Listener) {
-	var onceListener Listener
+func (p *Prompt[TValue]) Once(event Event, listener EventListener) {
+	var onceListener EventListener
 	onceListener = func(args ...any) {
 		listener(args)
 		p.Off(event, onceListener)
@@ -37,7 +38,7 @@ func (p *Prompt[TValue]) Once(event Event, listener Listener) {
 }
 
 // Off removes a listener for the specified event.
-func (p *Prompt[TValue]) Off(event Event, listener Listener) {
+func (p *Prompt[TValue]) Off(event Event, listener EventListener) {
 	listeners := p.listeners[event]
 	for i, l := range listeners {
 		if fmt.Sprintf("%p", l) == fmt.Sprintf("%p", listener) {

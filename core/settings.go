@@ -12,7 +12,6 @@ const (
 	SpaceAction
 	SubmitAction
 	CancelAction
-	DefaultAction
 )
 
 var aliases = map[KeyName]Action{
@@ -43,17 +42,19 @@ func UpdateSettings(settings Settings) {
 	}
 }
 
-// HandleKeyAction handles a key action based on the provided key and actions map
-func HandleKeyAction(key *Key, actions map[Action]func()) {
-	if action, actionExists := aliases[key.Name]; actionExists {
-		if listener, listenerExists := actions[action]; listenerExists {
-			if listener != nil {
-				listener()
+// NewActionHandler creates a closure of a action handler based on the provided key and actions map
+func NewActionHandler(listeners map[Action]func(), defaultListener func(key *Key)) (actionHandler func(key *Key)) {
+	return func(key *Key) {
+		if action, actionExists := aliases[key.Name]; actionExists {
+			if listener, listenerExists := listeners[action]; listenerExists {
+				if listener != nil {
+					listener()
+				}
+				return
 			}
-			return
 		}
-	}
-	if defaultListener := actions[DefaultAction]; defaultListener != nil {
-		defaultListener()
+		if defaultListener != nil {
+			defaultListener(key)
+		}
 	}
 }

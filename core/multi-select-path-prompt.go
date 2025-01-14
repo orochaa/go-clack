@@ -68,9 +68,29 @@ func NewMultiSelectPathPrompt(params MultiSelectPathPromptParams) *MultiSelectPa
 	p.CurrentOption = p.Root.FirstChild()
 	p.mapSelectedOptions(p.Root)
 
+	actionHandler := NewActionHandler(map[Action]func(){
+		UpAction:    func() { p.moveCursor(-1) },
+		DownAction:  func() { p.moveCursor(1) },
+		LeftAction:  p.closeNode,
+		RightAction: p.openNode,
+		HomeAction: func() {
+			if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
+				p.CurrentOption = layerOptions[0]
+				p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
+			}
+		},
+		EndAction: func() {
+			if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
+				p.CurrentOption = layerOptions[len(layerOptions)-1]
+				p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
+			}
+		},
+		SpaceAction: p.toggleOption,
+	}, p.filterOptions)
 	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
+		actionHandler(args[0].(*Key))
 	})
+
 	p.On(FinalizeEvent, func(args ...any) {
 		sort.SliceStable(p.Value, func(i, j int) bool {
 			return p.Value[i] < p.Value[j]
@@ -84,92 +104,83 @@ func (p *MultiSelectPathPrompt) Options() []*PathNode {
 	return p.Root.FilteredFlat(p.Search, p.CurrentOption)
 }
 
-func (p *MultiSelectPathPrompt) handleKeyPress(key *Key) {
-	moveCursor := func(direction int) {
-		if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
-			layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
-			p.CurrentOption = layerOptions[utils.MinMaxIndex(layerIndex+direction, len(layerOptions))]
-			p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
-		}
+func (p *MultiSelectPathPrompt) moveCursor(direction int) {
+	if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
+		layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
+		p.CurrentOption = layerOptions[utils.MinMaxIndex(layerIndex+direction, len(layerOptions))]
+		p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
+	}
+}
+
+func (p *MultiSelectPathPrompt) closeNode() {
+	p.Search = ""
+	if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
+		p.CurrentOption.Close()
+		return
 	}
 
-	HandleKeyAction(key, map[Action]func(){
-		UpAction:   func() { moveCursor(-1) },
-		DownAction: func() { moveCursor(1) },
-		LeftAction: func() {
-			p.Search = ""
-			if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
-				p.CurrentOption.Close()
-				return
-			}
-			if p.CurrentOption.IsRoot() {
-				p.Root = NewPathNode(path.Dir(p.Root.Path), PathNodeOptions{
-					OnlyShowDir: p.OnlyShowDir,
-					FileSystem:  p.FileSystem,
-				})
-				p.CurrentOption = p.Root
-				p.mapSelectedOptions(p.Root)
-				return
-			}
-			if p.CurrentOption.Parent.IsRoot() {
-				p.CurrentOption = p.Root
-				return
-			}
-			p.CurrentOption = p.CurrentOption.Parent
-			p.CurrentOption.Close()
-		},
-		RightAction: func() {
-			p.Search = ""
-			p.CurrentOption.Open()
-			if len(p.CurrentOption.Children) == 0 {
-				return
-			}
-			p.mapSelectedOptions(p.CurrentOption)
-			p.CurrentOption = p.CurrentOption.FirstChild()
-		},
-		HomeAction: func() {
-			if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
-				p.CurrentOption = layerOptions[0]
-				p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
-			}
-		},
-		EndAction: func() {
-			if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
-				p.CurrentOption = layerOptions[len(layerOptions)-1]
-				p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
-			}
-		},
-		SpaceAction: func() {
-			if p.CurrentOption.IsSelected {
-				p.CurrentOption.IsSelected = false
-				value := []string{}
-				for _, v := range p.Value {
-					if v != p.CurrentOption.Path {
-						value = append(value, v)
-					}
-				}
-				p.Value = value
-			} else {
-				p.CurrentOption.IsSelected = true
-				p.Value = append(p.Value, p.CurrentOption.Path)
-			}
-		},
-		DefaultAction: func() {
-			if p.Filter {
-				p.Search, _ = p.TrackKeyValue(key, p.Search, len(p.Search))
-				if !p.CurrentOption.IsRoot() {
-					layerOptions := p.CurrentOption.FilteredLayer(p.Search)
-					layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
-					options := p.Options()
+	if p.CurrentOption.IsRoot() {
+		p.Root = NewPathNode(path.Dir(p.Root.Path), PathNodeOptions{
+			OnlyShowDir: p.OnlyShowDir,
+			FileSystem:  p.FileSystem,
+		})
+		p.CurrentOption = p.Root
+		p.mapSelectedOptions(p.Root)
+		return
+	}
 
-					if layerIndex == -1 && len(layerOptions) > 0 {
-						p.CurrentOption = layerOptions[0]
-					}
-					p.CursorIndex = p.Root.IndexOf(p.CurrentOption, options)
-				}
+	if p.CurrentOption.Parent.IsRoot() {
+		p.CurrentOption = p.Root
+		return
+	}
+
+	p.CurrentOption = p.CurrentOption.Parent
+	p.CurrentOption.Close()
+}
+
+func (p *MultiSelectPathPrompt) openNode() {
+	p.Search = ""
+	p.CurrentOption.Open()
+	if len(p.CurrentOption.Children) > 0 {
+		p.mapSelectedOptions(p.CurrentOption)
+		p.CurrentOption = p.CurrentOption.FirstChild()
+	}
+}
+
+func (p *MultiSelectPathPrompt) toggleOption() {
+	if p.CurrentOption.IsSelected {
+		p.CurrentOption.IsSelected = false
+		value := []string{}
+		for _, v := range p.Value {
+			if v != p.CurrentOption.Path {
+				value = append(value, v)
 			}
-		},
-	})
+		}
+		p.Value = value
+	} else {
+		p.CurrentOption.IsSelected = true
+		p.Value = append(p.Value, p.CurrentOption.Path)
+	}
+}
+
+func (p *MultiSelectPathPrompt) filterOptions(key *Key) {
+	if !p.Filter {
+		return
+	}
+
+	p.Search, _ = p.TrackKeyValue(key, p.Search, len(p.Search))
+	if p.CurrentOption.IsRoot() {
+		return
+	}
+
+	layerOptions := p.CurrentOption.FilteredLayer(p.Search)
+	layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
+	options := p.Options()
+
+	if layerIndex == -1 && len(layerOptions) > 0 {
+		p.CurrentOption = layerOptions[0]
+	}
+	p.CursorIndex = p.Root.IndexOf(p.CurrentOption, options)
 }
 
 func (p *MultiSelectPathPrompt) mapSelectedOptions(node *PathNode) {

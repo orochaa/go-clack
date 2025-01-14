@@ -45,22 +45,20 @@ func NewConfirmPrompt(params ConfirmPromptParams) *ConfirmPrompt {
 		Inactive: params.Inactive,
 	}
 
+	actionHandler := NewActionHandler(map[Action]func(){
+		UpAction:    p.toggleValue,
+		DownAction:  p.toggleValue,
+		LeftAction:  p.toggleValue,
+		RightAction: p.toggleValue,
+	}, nil)
 	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
+		actionHandler(args[0].(*Key))
 	})
 
 	return &p
 }
 
-func (p *ConfirmPrompt) handleKeyPress(key *Key) {
-	toggleValue := func() {
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, 2)
-		p.Value = !p.Value
-	}
-	HandleKeyAction(key, map[Action]func(){
-		UpAction:    toggleValue,
-		DownAction:  toggleValue,
-		LeftAction:  toggleValue,
-		RightAction: toggleValue,
-	})
+func (p *ConfirmPrompt) toggleValue() {
+	p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+1, 2)
+	p.Value = !p.Value
 }

@@ -63,43 +63,36 @@ func NewSelectPrompt[TValue comparable](params SelectPromptParams[TValue]) *Sele
 		Required:       params.Required,
 	}
 
+	actionHandler := NewActionHandler(map[Action]func(){
+		UpAction:    func() { p.moveCursor(-1) },
+		DownAction:  func() { p.moveCursor(1) },
+		LeftAction:  func() { p.moveCursor(-1) },
+		RightAction: func() { p.moveCursor(1) },
+		HomeAction:  func() { p.CursorIndex = 0 },
+		EndAction:   func() { p.CursorIndex = len(p.Options) - 1 },
+	}, p.filterOptions)
 	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
+		actionHandler(args[0].(*Key))
+
+		if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
+			p.Value = p.Options[p.CursorIndex].Value
+		} else {
+			p.Value = *new(TValue)
+		}
 	})
 
 	return &p
 }
 
-func (p *SelectPrompt[TValue]) handleKeyPress(key *Key) {
-	moveCursor := func(direction int) {
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
-	}
-
-	HandleKeyAction(key, map[Action]func(){
-		UpAction:     func() { moveCursor(-1) },
-		DownAction:   func() { moveCursor(1) },
-		LeftAction:   func() { moveCursor(-1) },
-		RightAction:  func() { moveCursor(1) },
-		HomeAction:   func() { p.CursorIndex = 0 },
-		EndAction:    func() { p.CursorIndex = len(p.Options) - 1 },
-		SubmitAction: nil,
-		CancelAction: nil,
-		DefaultAction: func() {
-			if p.Filter {
-				p.filterOptions(key)
-			}
-		},
-	})
-
-	if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
-		p.Value = p.Options[p.CursorIndex].Value
-		return
-	}
-
-	p.Value = *new(TValue)
+func (p *SelectPrompt[TValue]) moveCursor(direction int) {
+	p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 }
 
 func (p *SelectPrompt[TValue]) filterOptions(key *Key) {
+	if !p.Filter {
+		return
+	}
+
 	p.Search, _ = p.TrackKeyValue(key, p.Search, len(p.Search))
 	p.CursorIndex = 0
 

@@ -62,60 +62,11 @@ func NewSelectPathPrompt(params SelectPathPromptParams) *SelectPathPrompt {
 	p.CurrentOption = p.Root.Children[0]
 	p.Value = p.CurrentOption.Path
 
-	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
-	})
-
-	return &p
-}
-
-func (p *SelectPathPrompt) Options() []*PathNode {
-	return p.Root.FilteredFlat(p.Search, p.CurrentOption)
-}
-
-func (p *SelectPathPrompt) handleKeyPress(key *Key) {
-	moveWithinLayer := func(direction int) {
-		if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
-			layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
-			p.CurrentOption = layerOptions[utils.MinMaxIndex(layerIndex+direction, len(layerOptions))]
-			p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
-		}
-	}
-
-	HandleKeyAction(key, map[Action]func(){
-		UpAction:   func() { moveWithinLayer(-1) },
-		DownAction: func() { moveWithinLayer(1) },
-		LeftAction: func() {
-			p.Search = ""
-			if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
-				p.CurrentOption.Close()
-				return
-			}
-
-			if p.CurrentOption.IsRoot() {
-				p.Root = NewPathNode(path.Dir(p.Root.Path), PathNodeOptions{
-					OnlyShowDir: p.OnlyShowDir,
-					FileSystem:  p.FileSystem,
-				})
-				p.CurrentOption = p.Root
-				return
-			}
-
-			if p.CurrentOption.Parent.IsRoot() {
-				p.CurrentOption = p.Root
-				return
-			}
-
-			p.CurrentOption = p.CurrentOption.Parent
-			p.CurrentOption.Close()
-		},
-		RightAction: func() {
-			p.Search = ""
-			p.CurrentOption.Open()
-			if len(p.CurrentOption.Children) > 0 {
-				p.CurrentOption = p.CurrentOption.FirstChild()
-			}
-		},
+	actionHandler := NewActionHandler(map[Action]func(){
+		UpAction:    func() { p.moveCursor(-1) },
+		DownAction:  func() { p.moveCursor(1) },
+		LeftAction:  p.closeNode,
+		RightAction: p.openNode,
 		HomeAction: func() {
 			if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
 				p.CurrentOption = layerOptions[0]
@@ -128,25 +79,81 @@ func (p *SelectPathPrompt) handleKeyPress(key *Key) {
 				p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
 			}
 		},
-		DefaultAction: func() {
-			if p.Filter {
-				p.Search, _ = p.TrackKeyValue(key, p.Search, len(p.Search))
-				if !p.CurrentOption.IsRoot() {
-					layerOptions := p.CurrentOption.FilteredLayer(p.Search)
-					layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
-					options := p.Options()
+	}, p.filterOptions)
+	p.On(KeyEvent, func(args ...any) {
+		actionHandler(args[0].(*Key))
 
-					if layerIndex == -1 && len(layerOptions) > 0 {
-						p.CurrentOption = layerOptions[0]
-					}
-
-					p.CursorIndex = p.Root.IndexOf(p.CurrentOption, options)
-				}
-			}
-		},
+		if p.CurrentOption != nil {
+			p.Value = p.CurrentOption.Path
+		} else {
+			p.Value = *new(string)
+		}
 	})
 
-	if p.CurrentOption != nil {
-		p.Value = p.CurrentOption.Path
+	return &p
+}
+
+func (p *SelectPathPrompt) Options() []*PathNode {
+	return p.Root.FilteredFlat(p.Search, p.CurrentOption)
+}
+
+func (p *SelectPathPrompt) moveCursor(direction int) {
+	if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
+		layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
+		p.CurrentOption = layerOptions[utils.MinMaxIndex(layerIndex+direction, len(layerOptions))]
+		p.CursorIndex = p.Root.IndexOf(p.CurrentOption, p.Options())
 	}
+}
+
+func (p *SelectPathPrompt) closeNode() {
+	p.Search = ""
+	if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
+		p.CurrentOption.Close()
+		return
+	}
+
+	if p.CurrentOption.IsRoot() {
+		p.Root = NewPathNode(path.Dir(p.Root.Path), PathNodeOptions{
+			OnlyShowDir: p.OnlyShowDir,
+			FileSystem:  p.FileSystem,
+		})
+		p.CurrentOption = p.Root
+		return
+	}
+
+	if p.CurrentOption.Parent.IsRoot() {
+		p.CurrentOption = p.Root
+		return
+	}
+
+	p.CurrentOption = p.CurrentOption.Parent
+	p.CurrentOption.Close()
+}
+
+func (p *SelectPathPrompt) openNode() {
+	p.Search = ""
+	p.CurrentOption.Open()
+	if len(p.CurrentOption.Children) > 0 {
+		p.CurrentOption = p.CurrentOption.FirstChild()
+	}
+}
+
+func (p *SelectPathPrompt) filterOptions(key *Key) {
+	if !p.Filter {
+		return
+	}
+
+	p.Search, _ = p.TrackKeyValue(key, p.Search, len(p.Search))
+	if p.CurrentOption.IsRoot() {
+		return
+	}
+
+	layerOptions := p.CurrentOption.FilteredLayer(p.Search)
+	layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
+	options := p.Options()
+
+	if layerIndex == -1 && len(layerOptions) > 0 {
+		p.CurrentOption = layerOptions[0]
+	}
+	p.CursorIndex = p.Root.IndexOf(p.CurrentOption, options)
 }

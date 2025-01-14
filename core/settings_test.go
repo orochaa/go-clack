@@ -14,12 +14,13 @@ func TestTriggerActionWithKeyAlias(t *testing.T) {
 			"j": core.DownAction,
 		},
 	})
-
 	counter := 0
-	core.HandleKeyAction(&core.Key{Name: "k"}, map[core.Action]func(){
+
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
 		core.UpAction:   func() { counter++ },
 		core.DownAction: t.FailNow,
-	})
+	}, nil)
+	actionHandler(&core.Key{Name: "k"})
 
 	assert.Equal(t, 1, counter)
 }
@@ -31,15 +32,15 @@ func TestTriggerDefaultAction(t *testing.T) {
 			"j": core.DownAction,
 		},
 	})
-
 	counter := 0
-	core.HandleKeyAction(&core.Key{Name: "l"}, map[core.Action]func(){
+
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
 		core.UpAction:   t.FailNow,
 		core.DownAction: t.FailNow,
-		core.DefaultAction: func() {
-			counter++
-		},
+	}, func(key *core.Key) {
+		counter++
 	})
+	actionHandler(&core.Key{Name: "l"})
 
 	assert.Equal(t, 1, counter)
 }
@@ -52,10 +53,11 @@ func TestTriggerNoAction(t *testing.T) {
 		},
 	})
 
-	core.HandleKeyAction(&core.Key{Name: "l"}, map[core.Action]func(){
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
 		core.UpAction:   t.FailNow,
 		core.DownAction: t.FailNow,
-	})
+	}, nil)
+	actionHandler(&core.Key{Name: "l"})
 }
 
 func TestTriggerAliasActionOverDefaultAction(t *testing.T) {
@@ -65,13 +67,13 @@ func TestTriggerAliasActionOverDefaultAction(t *testing.T) {
 			"j": core.DownAction,
 		},
 	})
-
 	counter := 0
-	core.HandleKeyAction(&core.Key{Name: "k"}, map[core.Action]func(){
-		core.UpAction:      func() { counter++ },
-		core.DownAction:    t.FailNow,
-		core.DefaultAction: t.FailNow,
-	})
+
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
+		core.UpAction:   func() { counter++ },
+		core.DownAction: t.FailNow,
+	}, func(key *core.Key) { t.FailNow() })
+	actionHandler(&core.Key{Name: "k"})
 
 	assert.Equal(t, 1, counter)
 }
@@ -84,11 +86,11 @@ func TestTriggerIgnoredActionOverDefaultAction(t *testing.T) {
 		},
 	})
 
-	core.HandleKeyAction(&core.Key{Name: "k"}, map[core.Action]func(){
-		core.UpAction:      nil,
-		core.DownAction:    t.FailNow,
-		core.DefaultAction: t.FailNow,
-	})
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
+		core.UpAction:   nil,
+		core.DownAction: t.FailNow,
+	}, func(key *core.Key) { t.FailNow() })
+	actionHandler(&core.Key{Name: "k"})
 }
 
 func TestTriggerActionWithInternalKeyAlias(t *testing.T) {
@@ -98,7 +100,9 @@ func TestTriggerActionWithInternalKeyAlias(t *testing.T) {
 		},
 	})
 
-	core.HandleKeyAction(&core.Key{Name: core.UpKey}, map[core.Action]func(){
+	actionHandler := core.NewActionHandler(map[core.Action]func(){
 		core.DownAction: t.FailNow,
-	})
+	}, nil)
+	actionHandler(&core.Key{Name: core.UpKey})
+
 }

@@ -60,57 +60,54 @@ func NewMultiSelectPrompt[TValue comparable](params MultiSelectPromptParams[TVal
 		Required:       params.Required,
 	}
 
+	actionHandler := NewActionHandler(map[Action]func(){
+		UpAction:    func() { p.moveCursor(-1) },
+		DownAction:  func() { p.moveCursor(1) },
+		LeftAction:  func() { p.moveCursor(-1) },
+		RightAction: func() { p.moveCursor(1) },
+		HomeAction:  func() { p.CursorIndex = 0 },
+		EndAction:   func() { p.CursorIndex = len(p.Options) - 1 },
+		SpaceAction: p.toggleOption,
+	}, func(key *Key) {
+		if p.Filter {
+			p.filterOptions(key)
+		} else if key.Name == "a" {
+			p.toggleAllOptions()
+		}
+	})
 	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
+		actionHandler(args[0].(*Key))
 	})
 
 	return &p
 }
 
-func (p *MultiSelectPrompt[TValue]) handleKeyPress(key *Key) {
-	moveCursor := func(direction int) {
-		p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
-	}
-
-	HandleKeyAction(key, map[Action]func(){
-		UpAction:    func() { moveCursor(-1) },
-		DownAction:  func() { moveCursor(1) },
-		LeftAction:  func() { moveCursor(-1) },
-		RightAction: func() { moveCursor(1) },
-		HomeAction:  func() { p.CursorIndex = 0 },
-		EndAction:   func() { p.CursorIndex = len(p.Options) - 1 },
-		SpaceAction: func() {
-			if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
-				option := p.Options[p.CursorIndex]
-				if option.IsSelected {
-					option.IsSelected = false
-					value := []TValue{}
-					for _, v := range p.Value {
-						if v != option.Value {
-							value = append(value, v)
-						}
-					}
-					p.Value = value
-					return
-				}
-
-				option.IsSelected = true
-				p.Value = append(p.Value, option.Value)
-			}
-		},
-		SubmitAction: nil,
-		CancelAction: nil,
-		DefaultAction: func() {
-			if p.Filter {
-				p.filterOptions(key)
-			} else if key.Name == "a" {
-				p.selectAll()
-			}
-		},
-	})
+func (p *MultiSelectPrompt[TValue]) moveCursor(direction int) {
+	p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 }
 
-func (p *MultiSelectPrompt[TValue]) selectAll() {
+func (p *MultiSelectPrompt[TValue]) toggleOption() {
+	if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
+		option := p.Options[p.CursorIndex]
+
+		if option.IsSelected {
+			option.IsSelected = false
+			value := []TValue{}
+			for _, v := range p.Value {
+				if v != option.Value {
+					value = append(value, v)
+				}
+			}
+			p.Value = value
+			return
+		}
+
+		option.IsSelected = true
+		p.Value = append(p.Value, option.Value)
+	}
+}
+
+func (p *MultiSelectPrompt[TValue]) toggleAllOptions() {
 	if len(p.Value) == len(p.Options) {
 		p.Value = []TValue{}
 		for _, option := range p.Options {
@@ -127,6 +124,10 @@ func (p *MultiSelectPrompt[TValue]) selectAll() {
 }
 
 func (p *MultiSelectPrompt[TValue]) filterOptions(key *Key) {
+	if !p.Filter {
+		return
+	}
+
 	var currentOption *MultiSelectOption[TValue]
 	if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
 		currentOption = p.Options[p.CursorIndex]
@@ -144,6 +145,7 @@ func (p *MultiSelectPrompt[TValue]) filterOptions(key *Key) {
 		for i, option := range p.Options {
 			if option.Value == currentOption.Value {
 				p.CursorIndex = i
+				break
 			}
 		}
 		return
@@ -154,6 +156,7 @@ func (p *MultiSelectPrompt[TValue]) filterOptions(key *Key) {
 	if err != nil {
 		return
 	}
+
 	for _, option := range p.initialOptions {
 		if matched := searchRegex.MatchString(option.Label); matched {
 			p.Options = append(p.Options, option)
