@@ -187,17 +187,18 @@ func (p *MultiSelectPathPrompt) openNode() {
 func (p *MultiSelectPathPrompt) toggleOption() {
 	if p.CurrentOption.IsSelected {
 		p.CurrentOption.IsSelected = false
-		value := []string{}
-		for _, v := range p.Value {
-			if v != p.CurrentOption.Path {
-				value = append(value, v)
+		for i, v := range p.Value {
+			if v == p.CurrentOption.Path {
+				p.Value = append(p.Value[:i], p.Value[i+1:]...)
+				break
 			}
 		}
-		p.Value = value
-	} else {
-		p.CurrentOption.IsSelected = true
-		p.Value = append(p.Value, p.CurrentOption.Path)
+		return
 	}
+
+	p.CurrentOption.IsSelected = true
+	p.Value = append(p.Value, p.CurrentOption.Path)
+
 }
 
 // filterOptions updates the search term based on the provided key input and filters the available options.

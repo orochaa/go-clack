@@ -124,13 +124,12 @@ func (p *MultiSelectPrompt[TValue]) toggleOption() {
 
 		if option.IsSelected {
 			option.IsSelected = false
-			value := []TValue{}
-			for _, v := range p.Value {
-				if v != option.Value {
-					value = append(value, v)
+			for i, v := range p.Value {
+				if v == option.Value {
+					p.Value = append(p.Value[:i], p.Value[i+1:]...)
+					break
 				}
 			}
-			p.Value = value
 			return
 		}
 

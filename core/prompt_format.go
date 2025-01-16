@@ -56,7 +56,7 @@ func (p *Prompt[TValue]) LimitLines(lines []string, usedLines int) string {
 		slidingWindowLocation = max(p.CursorIndex-2, 0)
 	}
 
-	result := []string{}
+	result := make([]string, 0, len(lines)+2)
 	shouldRenderTopEllipsis := maxItems < len(lines) && slidingWindowLocation > 0
 	shouldRenderBottomEllipsis := maxItems < len(lines) && slidingWindowLocation+maxItems < len(lines)
 
