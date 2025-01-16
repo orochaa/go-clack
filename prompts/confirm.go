@@ -65,7 +65,7 @@ func Confirm(params ConfirmParams) (bool, error) {
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[bool]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           value,
 				ValueWithCursor: valueWithCursor,

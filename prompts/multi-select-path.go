@@ -114,7 +114,7 @@ func MultiSelectPath(params MultiSelectPathParams) ([]string, error) {
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[[]string]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         message,
 				Value:           strings.Join(p.Value, "\n"),
 				ValueWithCursor: value,

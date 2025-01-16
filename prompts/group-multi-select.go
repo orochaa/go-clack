@@ -108,7 +108,7 @@ func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) 
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[[]TValue]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           value,
 				ValueWithCursor: value,

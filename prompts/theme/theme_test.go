@@ -73,7 +73,7 @@ func TestApplyThemeInitialState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State: core.InitialState,
 				},
 				Message:         "Test message",
@@ -147,7 +147,7 @@ func TestApplyThemeActiveState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State: core.ActiveState,
 				},
 				Message:         "Test message",
@@ -241,7 +241,7 @@ func TestApplyThemeErrorState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State: core.ErrorState,
 					Error: tC.Error,
 				},
@@ -301,7 +301,7 @@ func TestApplyThemeSubmitState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State: core.SubmitState,
 				},
 				Message:     "Test message",
@@ -362,7 +362,7 @@ func TestApplyThemeCancelState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State: core.CancelState,
 				},
 				Message:     "Test message",
@@ -476,7 +476,7 @@ func TestApplyThemeValidateState(t *testing.T) {
 	for _, tC := range testCases {
 		t.Run(tC.Description, func(t *testing.T) {
 			frame := theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx: core.Prompt[string]{
+				Context: core.Prompt[string]{
 					State:              core.ValidateState,
 					IsValidating:       true,
 					ValidationDuration: tC.ValidationDuration,

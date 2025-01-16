@@ -50,7 +50,7 @@ func Password(params PasswordParams) (string, error) {
 		Validate:     params.Validate,
 		Render: func(p *core.PasswordPrompt) string {
 			return theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           p.ValueWithMask(),
 				ValueWithCursor: p.ValueWithMaskAndCursor(),

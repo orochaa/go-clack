@@ -52,7 +52,7 @@ func Text(params TextParams) (string, error) {
 		Validate:     params.Validate,
 		Render: func(p *core.TextPrompt) string {
 			return theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           p.Value,
 				ValueWithCursor: p.ValueWithCursor(),

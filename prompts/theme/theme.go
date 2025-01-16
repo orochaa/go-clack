@@ -13,7 +13,7 @@ type ThemeValue interface {
 }
 
 type ThemeParams[TValue ThemeValue] struct {
-	Ctx             core.Prompt[TValue]
+	Context         core.Prompt[TValue]
 	Message         string
 	Value           string
 	ValueWithCursor string
@@ -21,7 +21,7 @@ type ThemeParams[TValue ThemeValue] struct {
 }
 
 func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
-	ctx := params.Ctx
+	ctx := params.Context
 
 	frame := NewFrame()
 	frame.WriteLn(picocolors.Gray(symbols.BAR))

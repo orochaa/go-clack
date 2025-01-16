@@ -72,7 +72,7 @@ func Path(params PathParams) (string, error) {
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[string]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           p.Value,
 				ValueWithCursor: valueWithCursor,

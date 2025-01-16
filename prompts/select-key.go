@@ -77,7 +77,7 @@ func SelectKey[TValue comparable](params SelectKeyParams[TValue]) (TValue, error
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[TValue]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         params.Message,
 				Value:           params.Options[p.CursorIndex].Label,
 				ValueWithCursor: value,

@@ -123,7 +123,7 @@ func Select[TValue comparable](params SelectParams[TValue]) (TValue, error) {
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[TValue]{
-				Ctx:             p.Prompt,
+				Context:         p.Prompt,
 				Message:         message,
 				Value:           value,
 				ValueWithCursor: value,
