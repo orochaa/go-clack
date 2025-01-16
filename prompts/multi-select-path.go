@@ -3,6 +3,7 @@ package prompts
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/Mist3rBru/go-clack/core"
@@ -14,6 +15,8 @@ import (
 
 type MultiSelectPathParams struct {
 	Context      context.Context
+	Input        *os.File
+	Output       *os.File
 	Message      string
 	InitialValue []string
 	InitialPath  string
@@ -34,7 +37,9 @@ type MultiSelectPathParams struct {
 // If an error occurs during the prompt, it also returns an error.
 //
 // Parameters:
-//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
 //   - Message (string): The message to display to the user (default: "").
 //   - InitialValue ([]string): Initial selected paths (default: nil).
 //   - InitialPath (string): The initial directory path to start from (default: current working directory).
@@ -50,6 +55,8 @@ type MultiSelectPathParams struct {
 func MultiSelectPath(params MultiSelectPathParams) ([]string, error) {
 	p := core.NewMultiSelectPathPrompt(core.MultiSelectPathPromptParams{
 		Context:      params.Context,
+		Input:        params.Input,
+		Output:       params.Output,
 		InitialValue: params.InitialValue,
 		InitialPath:  params.InitialPath,
 		OnlyShowDir:  params.OnlyShowDir,

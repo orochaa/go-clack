@@ -2,6 +2,7 @@ package prompts
 
 import (
 	"context"
+	"os"
 
 	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/prompts/test"
@@ -11,6 +12,8 @@ import (
 
 type PathParams struct {
 	Context      context.Context
+	Input        *os.File
+	Output       *os.File
 	Message      string
 	InitialValue string
 	OnlyShowDir  bool
@@ -28,7 +31,9 @@ type PathParams struct {
 // If an error occurs during the prompt, it also returns an error.
 //
 // Parameters:
-//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
 //   - Message (string): The message to display to the user (default: "").
 //   - InitialValue (string): The initial value of the path input (default: current working directory).
 //   - OnlyShowDir (bool): Whether to only show directories (default: false).
@@ -42,6 +47,8 @@ type PathParams struct {
 func Path(params PathParams) (string, error) {
 	p := core.NewPathPrompt(core.PathPromptParams{
 		Context:      params.Context,
+		Input:        params.Input,
+		Output:       params.Output,
 		InitialValue: params.InitialValue,
 		OnlyShowDir:  params.OnlyShowDir,
 		Required:     params.Required,

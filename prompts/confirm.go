@@ -2,6 +2,7 @@ package prompts
 
 import (
 	"context"
+	"os"
 	"strings"
 
 	"github.com/Mist3rBru/go-clack/core"
@@ -13,6 +14,8 @@ import (
 
 type ConfirmParams struct {
 	Context      context.Context
+	Input        *os.File
+	Output       *os.File
 	Message      string
 	InitialValue bool
 	Active       string
@@ -28,7 +31,9 @@ type ConfirmParams struct {
 // If an error occurs during the prompt, it also returns an error.
 //
 // Parameters:
-//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
 //   - Message (string): The message to display to the user (default: "").
 //   - InitialValue (bool): The initial value of the prompt (default: false).
 //   - Active (string): The active option to display (default: "yes").
@@ -40,6 +45,8 @@ type ConfirmParams struct {
 func Confirm(params ConfirmParams) (bool, error) {
 	p := core.NewConfirmPrompt(core.ConfirmPromptParams{
 		Context:      params.Context,
+		Input:        params.Input,
+		Output:       params.Output,
 		InitialValue: params.InitialValue,
 		Active:       params.Active,
 		Inactive:     params.Inactive,

@@ -2,6 +2,7 @@ package prompts
 
 import (
 	"context"
+	"os"
 
 	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/prompts/test"
@@ -10,6 +11,8 @@ import (
 
 type PasswordParams struct {
 	Context      context.Context
+	Input        *os.File
+	Output       *os.File
 	Message      string
 	InitialValue string
 	Required     bool
@@ -26,7 +29,9 @@ type PasswordParams struct {
 // If an error occurs during the prompt, it also returns an error.
 //
 // Parameters:
-//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
 //   - Message (string): The message to display to the user (default: "").
 //   - InitialValue (string): The initial value of the password input (default: "").
 //   - Required (bool): Whether the password input is required (default: false).
@@ -38,6 +43,8 @@ type PasswordParams struct {
 func Password(params PasswordParams) (string, error) {
 	p := core.NewPasswordPrompt(core.PasswordPromptParams{
 		Context:      params.Context,
+		Input:        params.Input,
+		Output:       params.Output,
 		InitialValue: params.InitialValue,
 		Required:     params.Required,
 		Validate:     params.Validate,

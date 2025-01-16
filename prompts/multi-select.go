@@ -3,6 +3,7 @@ package prompts
 import (
 	"context"
 	"fmt"
+	"os"
 	"strings"
 
 	"github.com/Mist3rBru/go-clack/core"
@@ -22,6 +23,8 @@ type MultiSelectOption[TValue comparable] struct {
 
 type MultiSelectParams[TValue comparable] struct {
 	Context      context.Context
+	Input        *os.File
+	Output       *os.File
 	Message      string
 	Options      []*MultiSelectOption[TValue]
 	InitialValue []TValue
@@ -40,7 +43,9 @@ type MultiSelectParams[TValue comparable] struct {
 // If an error occurs during the prompt, it also returns an error.
 //
 // Parameters:
-//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
 //   - Message (string): The message to display to the user (default: "").
 //   - Options ([]*MultiSelectOption[TValue]): A list of options for the prompt (default: nil.
 //   - InitialValue ([]TValue): The initial selected values (default: nil.
@@ -66,6 +71,8 @@ func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue,
 
 	p := core.NewMultiSelectPrompt(core.MultiSelectPromptParams[TValue]{
 		Context:      params.Context,
+		Input:        params.Input,
+		Output:       params.Output,
 		InitialValue: params.InitialValue,
 		Options:      options,
 		Filter:       params.Filter,
