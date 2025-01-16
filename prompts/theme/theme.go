@@ -23,7 +23,7 @@ type ThemeParams[TValue ThemeValue] struct {
 func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 	ctx := params.Context
 
-	frame := NewFrame()
+	frame := core.NewFrame()
 	frame.WriteLn(picocolors.Gray(symbols.BAR))
 
 	symbolColor := SymbolColor(ctx.State)

@@ -1,19 +1,20 @@
-package theme
+package core_test
 
 import (
 	"testing"
 
+	"github.com/Mist3rBru/go-clack/core"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestNewFrame(t *testing.T) {
-	frame := NewFrame()
+	frame := core.NewFrame()
 
 	assert.Equal(t, "", frame.String())
 }
 
 func TestWriteLn(t *testing.T) {
-	frame := NewFrame()
+	frame := core.NewFrame()
 
 	frame.WriteLn("Hello", "World")
 	expected := "Hello\r\nWorld\r\n"
@@ -22,7 +23,7 @@ func TestWriteLn(t *testing.T) {
 }
 
 func TestString(t *testing.T) {
-	frame := NewFrame()
+	frame := core.NewFrame()
 
 	frame.WriteLn("Test")
 	expected := "Test\r\n"
@@ -31,7 +32,7 @@ func TestString(t *testing.T) {
 }
 
 func TestRemoveTrailingCRLF(t *testing.T) {
-	frame := NewFrame()
+	frame := core.NewFrame()
 
 	frame.WriteLn("Line 1", "Line 2")
 	frame.RemoveTrailingCRLF()

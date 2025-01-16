@@ -56,7 +56,7 @@ func (p *Prompt[TValue]) LimitLines(lines []string, usedLines int) string {
 		slidingWindowLocation = max(p.CursorIndex-2, 0)
 	}
 
-	result := make([]string, 0, len(lines)+2)
+	frame := NewFrame()
 	shouldRenderTopEllipsis := maxItems < len(lines) && slidingWindowLocation > 0
 	shouldRenderBottomEllipsis := maxItems < len(lines) && slidingWindowLocation+maxItems < len(lines)
 
@@ -64,13 +64,15 @@ func (p *Prompt[TValue]) LimitLines(lines []string, usedLines int) string {
 		isTopLimit := i == 0 && shouldRenderTopEllipsis
 		isBottomLimit := i == maxItems-1 && shouldRenderBottomEllipsis
 		if isTopLimit || isBottomLimit {
-			result = append(result, picocolors.Dim("..."))
+			frame.WriteLn(picocolors.Dim("..."))
 			continue
 		}
-		result = append(result, line)
+		frame.WriteLn(line)
 	}
 
-	return strings.Join(result, "\n")
+	frame.RemoveTrailingCRLF()
+
+	return frame.String()
 }
 
 type LineOption int
@@ -231,7 +233,7 @@ func (p *Prompt[TValue]) FormatLines(lines []string, options FormatLinesOptions)
 	newLine := getLineOptions(options, NewLine)
 	lastLine := getLineOptions(options, LastLine)
 
-	formattedLines := []string{}
+	frame := NewFrame()
 	for i, line := range lines {
 		var opts FormatLineOptions
 		if i == 0 && len(lines) == 1 {
@@ -269,7 +271,7 @@ func (p *Prompt[TValue]) FormatLines(lines []string, options FormatLinesOptions)
 				endSpace = " "
 			}
 			formattedLine := strings.Join([]string{opts.Start, startSpace, styledLine, endSpace, opts.End}, "")
-			formattedLines = append(formattedLines, formattedLine)
+			frame.WriteLn(formattedLine)
 		}
 
 		if len(lines) == 1 && strings.Trim(lines[0], " ") == "" {
@@ -311,5 +313,7 @@ func (p *Prompt[TValue]) FormatLines(lines []string, options FormatLinesOptions)
 		formatAndAddLine(currentLine)
 	}
 
-	return strings.Join(formattedLines, "\r\n")
+	frame.RemoveTrailingCRLF()
+
+	return frame.String()
 }
