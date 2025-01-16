@@ -23,6 +23,22 @@ type SelectKeyParams[TValue comparable] struct {
 	Options []SelectKeyOption[TValue]
 }
 
+// SelectKey displays a select-key prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can select an option by clicking on the related key.
+// The prompt returns the value of the selected option.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - Options ([]*SelectKeyOption[TValue]): A list of options for the prompt (default: nil).
+//
+// Returns:
+//   - TValue: The value of the selected option.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func SelectKey[TValue comparable](params SelectKeyParams[TValue]) (TValue, error) {
 	v := validator.NewValidator("SelectKey")
 	v.ValidateOptions(len(params.Options))

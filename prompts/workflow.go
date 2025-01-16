@@ -119,6 +119,9 @@ func (w *WorkflowBuilder) Run() error {
 	return nil
 }
 
+// Workflow returns a new WorkflowBuilder instance, allowing you to define a workflow that populates the provided value.
+// The value should be a struct, and each field will be populated by a corresponding step in the workflow.
+// If the field does not correspond to a struct's field, it panics
 func Workflow(v any) *WorkflowBuilder {
 	return &WorkflowBuilder{result: v}
 }

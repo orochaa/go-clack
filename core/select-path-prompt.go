@@ -32,6 +32,26 @@ type SelectPathPromptParams struct {
 	Render       func(p *SelectPathPrompt) string
 }
 
+// NewSelectPathPrompt initializes and returns a new instance of SelectPathPrompt.
+//
+// The user can navigate through directories and files using arrow keys.
+// The user can select an option using enter key.
+// The prompt returns the path of the selected option.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
+//   - InitialValue (string): The initial path value (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//   - Render (func(p *SelectPathPrompt) string): Custom render function for the prompt (default: nil).
+//
+// Returns:
+//   - *SelectPathPrompt: A new instance of SelectPathPrompt.
 func NewSelectPathPrompt(params SelectPathPromptParams) *SelectPathPrompt {
 	v := validator.NewValidator("SelectPathPrompt")
 	v.ValidateRender(params.Render)
@@ -96,10 +116,18 @@ func NewSelectPathPrompt(params SelectPathPromptParams) *SelectPathPrompt {
 	return &p
 }
 
+// Options returns a list of filtered and flattened PathNode options based on the current search term and selected node.
+//
+// Returns:
+//   - []*PathNode: A slice of PathNode objects representing the available options.
 func (p *SelectPathPrompt) Options() []*PathNode {
 	return p.Root.FilteredFlat(p.Search, p.CurrentOption)
 }
 
+// moveCursor moves the cursor up or down within the current layer of options.
+//
+// Parameters:
+//   - direction (int): The direction to move the cursor (-1 for up, 1 for down).
 func (p *SelectPathPrompt) moveCursor(direction int) {
 	if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
 		layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
@@ -108,6 +136,7 @@ func (p *SelectPathPrompt) moveCursor(direction int) {
 	}
 }
 
+// closeNode closes the currently selected node or moves up to the parent directory.
 func (p *SelectPathPrompt) closeNode() {
 	p.Search = ""
 	if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
@@ -133,6 +162,7 @@ func (p *SelectPathPrompt) closeNode() {
 	p.CurrentOption.Close()
 }
 
+// openNode opens the currently selected node, revealing its children if any exist.
 func (p *SelectPathPrompt) openNode() {
 	p.Search = ""
 	p.CurrentOption.Open()
@@ -141,6 +171,10 @@ func (p *SelectPathPrompt) openNode() {
 	}
 }
 
+// filterOptions updates the search term based on the provided key input and filters the available options.
+//
+// Parameters:
+//   - key (*Key): The key event that triggered the filtering.
 func (p *SelectPathPrompt) filterOptions(key *Key) {
 	if !p.Filter {
 		return

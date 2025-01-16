@@ -62,6 +62,19 @@ type PromptParams[TValue any] struct {
 	Render       func(p *Prompt[TValue]) string
 }
 
+// NewPrompt initializes a new Prompt with the provided parameters.
+//
+// Parameters:
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
+//   - InitialValue (TValue): The initial value of the prompt (default: zero value of TValue).
+//   - CursorIndex (int): The initial cursor position in the input (default: 0).
+//   - Validate (func(value TValue) error): Custom validation function for the input (default: nil).
+//   - Render (func(p *Prompt[TValue]) string): Custom render function for the prompt (default: nil).
+//
+// Returns:
+//   - *Prompt[TValue]: A new instance of Prompt.
 func NewPrompt[TValue any](params PromptParams[TValue]) *Prompt[TValue] {
 	v := validator.NewValidator("Prompt")
 	v.ValidateRender(params.Render)
@@ -209,6 +222,7 @@ func (p *Prompt[TValue]) PressKey(key *Key) {
 	}
 }
 
+// validate performs validation on the current value of the prompt.
 func (p *Prompt[TValue]) validate() error {
 	if p.Validate == nil {
 		return nil
@@ -253,6 +267,7 @@ func (p *Prompt[TValue]) DiffLines(oldFrame, newFrame string) []int {
 	return diff
 }
 
+// Size retrieves the width and height of the terminal output.
 func (p *Prompt[TValue]) Size() (width int, height int, err error) {
 	return term.GetSize(int(p.output.Fd()))
 }

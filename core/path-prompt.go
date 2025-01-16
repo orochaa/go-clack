@@ -34,6 +34,27 @@ type PathPromptParams struct {
 	Render       func(p *PathPrompt) string
 }
 
+// NewPathPrompt initializes and returns a new instance of PathPrompt.
+//
+// The user can input a path.
+// The prompt has built-in autosuggestion and autocomplete features.
+// The prompt returns the path.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
+//   - InitialValue (string): The initial value of the path input (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Required (bool): Whether the path input is required (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//   - Validate (func(value string) error): Custom validation function for the path (default: nil).
+//   - Render (func(p *PathPrompt) string): Custom render function for the prompt (default: nil).
+//
+// Returns:
+//   - *PathPrompt: A new instance of PathPrompt.
 func NewPathPrompt(params PathPromptParams) *PathPrompt {
 	v := validator.NewValidator("PathPrompt")
 	v.ValidateRender(params.Render)
@@ -73,6 +94,11 @@ func NewPathPrompt(params PathPromptParams) *PathPrompt {
 	return &p
 }
 
+// mapHintOptions generates a list of hint options based on the current path value.
+// It filters entries in the current directory that match the end of the path value.
+//
+// Returns:
+//   - []string: A slice of hint options.
 func (p *PathPrompt) mapHintOptions() []string {
 	options := []string{}
 	dirPathRegex := regexp.MustCompile(`^(.*)/.*\s*`)
@@ -105,12 +131,19 @@ func (p *PathPrompt) mapHintOptions() []string {
 	return options
 }
 
+// valueEnd extracts the last segment of the current path value.
+// This is used to match hint options with the current input.
+//
+// Returns:
+//   - string: The last segment of the path value.
 func (p *PathPrompt) valueEnd() string {
 	valueEndRegex := regexp.MustCompile("^.*/(.*)$")
 	valueEnd := valueEndRegex.ReplaceAllString(p.Value, "$1")
 	return valueEnd
 }
 
+// changeHint updates the hint based on the current path value and available hint options.
+// If no hint options are available, the hint is cleared.
 func (p *PathPrompt) changeHint() {
 	hintOptions := p.mapHintOptions()
 	p.HintOptions = []string{}
@@ -121,6 +154,12 @@ func (p *PathPrompt) changeHint() {
 	}
 }
 
+// ValueWithCursor returns the current path value with a cursor indicator.
+// The cursor is represented by an inverse character at the current cursor position.
+// If the cursor is at the end of the value, the hint is displayed.
+//
+// Returns:
+//   - string: The path value with the cursor indicator and hint.
 func (p *PathPrompt) ValueWithCursor() string {
 	var (
 		value string
@@ -142,6 +181,8 @@ func (p *PathPrompt) ValueWithCursor() string {
 	return value + hint
 }
 
+// completeValue appends the current hint to the path value and updates the cursor position.
+// The hint is then cleared, and new hint options are generated.
 func (p *PathPrompt) completeValue() {
 	p.Value += p.Hint
 	p.Prompt.Value = p.Value
@@ -151,6 +192,9 @@ func (p *PathPrompt) completeValue() {
 	p.changeHint()
 }
 
+// tabComplete handles tab completion for the path input.
+// If there is only one hint option, it completes the value.
+// Otherwise, it cycles through the available hint options.
 func (p *PathPrompt) tabComplete() {
 	hintOption := p.mapHintOptions()
 	if len(hintOption) == 1 {
@@ -164,6 +208,12 @@ func (p *PathPrompt) tabComplete() {
 	}
 }
 
+// handleKeyPress processes key events for the path input.
+// It updates the path value and cursor position based on the key pressed.
+// Special keys like Tab and Right Arrow trigger hint completion.
+//
+// Parameters:
+//   - key (*Key): The key event to process.
 func (p *PathPrompt) handleKeyPress(key *Key) {
 	p.Value, p.CursorIndex = p.TrackKeyValue(key, p.Value, p.CursorIndex)
 	if key.Name == RightKey && p.CursorIndex >= len(p.Value) {

@@ -36,6 +36,29 @@ type MultiSelectPathPromptParams struct {
 	Render       func(p *MultiSelectPathPrompt) string
 }
 
+// NewMultiSelectPathPrompt initializes and returns a new instance of MultiSelectPathPrompt.
+//
+// The user can navigate through directories and files using arrow keys.
+// The user can select multiple options using space key.
+// The prompt returns the path of the selected options.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
+//   - InitialValue ([]string): Initial selected paths (default: nil).
+//   - InitialPath (string): The initial directory path to start from (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Required (bool): Whether at least one option must be selected (default: false).
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//   - Validate (func(value []string) error): Custom validation function (default: nil).
+//   - Render (func(p *MultiSelectPathPrompt) string): Custom render function (default: nil).
+//
+// Returns:
+//   - *MultiSelectPathPrompt: A new instance of MultiSelectPathPrompt.
 func NewMultiSelectPathPrompt(params MultiSelectPathPromptParams) *MultiSelectPathPrompt {
 	v := validator.NewValidator("MultiSelectPathPrompt")
 	v.ValidateRender(params.Render)
@@ -103,10 +126,18 @@ func NewMultiSelectPathPrompt(params MultiSelectPathPromptParams) *MultiSelectPa
 	return &p
 }
 
+// Options returns a list of filtered PathNode options based on the current layer and search term.
+//
+// Returns:
+//   - []*PathNode: A slice of PathNode objects representing the available options.
 func (p *MultiSelectPathPrompt) Options() []*PathNode {
 	return p.Root.FilteredFlat(p.Search, p.CurrentOption)
 }
 
+// moveCursor moves the cursor up or down within the current layer of options.
+//
+// Parameters:
+//   - direction (int): The direction to move the cursor (-1 for up, 1 for down).
 func (p *MultiSelectPathPrompt) moveCursor(direction int) {
 	if layerOptions := p.CurrentOption.FilteredLayer(p.Search); len(layerOptions) > 0 {
 		layerIndex := p.Root.IndexOf(p.CurrentOption, layerOptions)
@@ -115,6 +146,7 @@ func (p *MultiSelectPathPrompt) moveCursor(direction int) {
 	}
 }
 
+// closeNode closes the currently selected node or moves up to the parent directory.
 func (p *MultiSelectPathPrompt) closeNode() {
 	p.Search = ""
 	if p.CurrentOption.IsOpen && len(p.CurrentOption.Children) == 0 {
@@ -141,6 +173,7 @@ func (p *MultiSelectPathPrompt) closeNode() {
 	p.CurrentOption.Close()
 }
 
+// openNode opens the currently selected node, revealing its children if any exist.
 func (p *MultiSelectPathPrompt) openNode() {
 	p.Search = ""
 	p.CurrentOption.Open()
@@ -150,6 +183,7 @@ func (p *MultiSelectPathPrompt) openNode() {
 	}
 }
 
+// toggleOption toggles the selection state of the currently selected option.
 func (p *MultiSelectPathPrompt) toggleOption() {
 	if p.CurrentOption.IsSelected {
 		p.CurrentOption.IsSelected = false
@@ -166,6 +200,10 @@ func (p *MultiSelectPathPrompt) toggleOption() {
 	}
 }
 
+// filterOptions updates the search term based on the provided key input and filters the available options.
+//
+// Parameters:
+//   - key (*Key): The key event that triggered the filtering.
 func (p *MultiSelectPathPrompt) filterOptions(key *Key) {
 	if !p.Filter {
 		return
@@ -186,6 +224,10 @@ func (p *MultiSelectPathPrompt) filterOptions(key *Key) {
 	p.CursorIndex = p.Root.IndexOf(p.CurrentOption, options)
 }
 
+// mapSelectedOptions traverses the provided node and its children, marking them as selected if their paths match any in the prompt's value.
+//
+// Parameters:
+//   - node (*PathNode): The root node to start traversing from.
 func (p *MultiSelectPathPrompt) mapSelectedOptions(node *PathNode) {
 	node.TraverseNodes(func(node *PathNode) {
 		for _, path := range p.Value {

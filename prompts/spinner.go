@@ -31,11 +31,15 @@ type SpinnerOptions struct {
 }
 
 type SpinnerController struct {
-	Start   func(msg string)
+	// Starts the spinner animation with the provided message
+	Start func(msg string)
+	// Updates the spinner's displayed message
 	Message func(msg string)
-	Stop    func(msg string, code int)
+	// Stops the spinner animation and displays a final message with a status indicator.
+	Stop func(msg string, code int)
 }
 
+// Spinner initializes and returns a SpinnerController with the provided options.
 func Spinner(options SpinnerOptions) *SpinnerController {
 	done := make(chan any)
 

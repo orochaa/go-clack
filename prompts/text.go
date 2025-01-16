@@ -11,12 +11,31 @@ import (
 type TextParams struct {
 	Context      context.Context
 	Message      string
-	Placeholder  string
 	InitialValue string
+	Placeholder  string
 	Required     bool
 	Validate     func(value string) error
 }
 
+// Text displays a input prompt to the user.
+//
+// The prompt displays a message.
+// The user can input a value.
+// The prompt returns the value.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (string): The initial value of the text input (default: "").
+//   - Placeholder (string): The placeholder text to display when the input is empty (default: "").
+//   - Required (bool): Whether the text input is required (default: false).
+//   - Validate (func(value string) error): Custom validation function for the input (default: nil).
+//
+// Returns:
+//   - string: The typed value.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func Text(params TextParams) (string, error) {
 	p := core.NewTextPrompt(core.TextPromptParams{
 		Context:      params.Context,

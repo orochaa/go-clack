@@ -22,6 +22,30 @@ type GroupMultiSelectParams[TValue comparable] struct {
 	Validate       func(value []TValue) error
 }
 
+// GroupMultiSelect displays a grouped multi select prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can navigate between options using arrow keys.
+// The user can select multiple options using space key.
+// The prompt returns the values of the selected options.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - Options (map[string][]MultiSelectOption[TValue]):
+//     A map of group names to a slice of MultiSelectOption[TValue] values.
+//     Each MultiSelectOption[TValue] contains a Label, Value, and IsSelected field (default: nil).
+//   - InitialValue ([]TValue): The initial value of the prompt (default: nil).
+//   - DisabledGroups (bool): Whether the groups selection are disabled (default: false).
+//   - SpacedGroups (bool): Whether the groups are spaced out (default: false).
+//   - Required (bool): Whether the prompt is required (default: false).
+//   - Validate (func(value []TValue) error): Custom validation function for the prompt (default: nil).
+//
+// Returns:
+//   - []TValue: The values of the selected options.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) ([]TValue, error) {
 	v := validator.NewValidator("GroupMultiSelect")
 	v.ValidateOptions(len(params.Options))

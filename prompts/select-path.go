@@ -23,6 +23,26 @@ type SelectPathParams struct {
 	FileSystem   FileSystem
 }
 
+// SelectPath displays a select prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can navigate through directories and files using arrow keys.
+// The user can select an option using enter key.
+// The prompt returns the path of the selected option.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (string): The initial path value (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//
+// Returns:
+//   - string: The path of the selected option.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func SelectPath(params SelectPathParams) (string, error) {
 	p := core.NewSelectPathPrompt(core.SelectPathPromptParams{
 		Context:      params.Context,

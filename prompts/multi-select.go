@@ -30,6 +30,27 @@ type MultiSelectParams[TValue comparable] struct {
 	Validate     func(value []TValue) error
 }
 
+// MultiSelect displays a multi-select prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can navigate through options using arrow keys.
+// The user can select multiple options using space key.
+// The prompt returns the value of the selected options.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - Options ([]*MultiSelectOption[TValue]): A list of options for the prompt (default: nil.
+//   - InitialValue ([]TValue): The initial selected values (default: nil.
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - Required (bool): Whether the prompt requires at least one selection (default: false).
+//   - Validate (func(value []TValue) error): Custom validation function for the prompt (default: nil).
+//
+// Returns:
+//   - []TValue: A slice of values of the selected options.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue, error) {
 	v := validator.NewValidator("MultiSelect")
 	v.ValidateOptions(len(params.Options))

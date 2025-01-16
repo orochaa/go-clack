@@ -16,6 +16,7 @@ type NoteOptions struct {
 	Output io.Writer
 }
 
+// Note displays a formatted note box with a title, message, and borders.
 func Note(msg string, options NoteOptions) {
 	if options.Output == nil {
 		options.Output = os.Stdout

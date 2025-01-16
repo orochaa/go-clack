@@ -18,12 +18,35 @@ type MultiSelectPathParams struct {
 	InitialValue []string
 	InitialPath  string
 	Required     bool
-	Validate     func(value []string) error
 	OnlyShowDir  bool
 	Filter       bool
 	FileSystem   FileSystem
+	Validate     func(value []string) error
 }
 
+// MultiSelectPath displays a multi-select prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can navigate through directories and files using arrow keys.
+// The user can select multiple options using space key.
+// The prompt returns the path of the selected options.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue ([]string): Initial selected paths (default: nil).
+//   - InitialPath (string): The initial directory path to start from (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Required (bool): Whether at least one option must be selected (default: false).
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//   - Validate (func(value []TValue) error): Custom validation function for the prompt (default: nil).
+//
+// Returns:
+//   - []string: A slice of paths of the selected options.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func MultiSelectPath(params MultiSelectPathParams) ([]string, error) {
 	p := core.NewMultiSelectPathPrompt(core.MultiSelectPathPromptParams{
 		Context:      params.Context,

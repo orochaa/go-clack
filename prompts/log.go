@@ -28,6 +28,7 @@ func styleMsg(msg string, style func(msg string) string) string {
 	return strings.Join(styledParts, "\n")
 }
 
+// Intro displays an introductory message.
 func Intro(msg string) {
 	p := &core.Prompt[string]{}
 	formattedMsg := p.FormatLines(strings.Split(msg, "\n"), MessageOptions{
@@ -41,6 +42,7 @@ func Intro(msg string) {
 	os.Stdout.WriteString(fmt.Sprintf("\r\n%s\r\n%s\r\n", formattedMsg, picocolors.Gray(symbols.BAR)))
 }
 
+// Cancel displays a cancellation message styled in red.
 func Cancel(msg string) {
 	Message(styleMsg(msg, picocolors.Red), MessageOptions{
 		Default: MessageLineOptions{
@@ -52,6 +54,7 @@ func Cancel(msg string) {
 	})
 }
 
+// Outro displays a closing message.
 func Outro(msg string) {
 	Message("\n"+msg, MessageOptions{
 		Default: MessageLineOptions{
@@ -63,6 +66,7 @@ func Outro(msg string) {
 	})
 }
 
+// Info displays an informational message with a blue info symbol.
 func Info(msg string) {
 	Message(msg, MessageOptions{
 		FirstLine: MessageLineOptions{
@@ -74,6 +78,7 @@ func Info(msg string) {
 	})
 }
 
+// Success displays a success message with a green success symbol.
 func Success(msg string) {
 	Message(msg, MessageOptions{
 		FirstLine: MessageLineOptions{
@@ -85,6 +90,7 @@ func Success(msg string) {
 	})
 }
 
+// Step displays a step message with a green step symbol.
 func Step(msg string) {
 	Message(msg, MessageOptions{
 		FirstLine: MessageLineOptions{
@@ -96,6 +102,7 @@ func Step(msg string) {
 	})
 }
 
+// Warn displays a warning message with a yellow warning symbol.
 func Warn(msg string) {
 	Message(msg, MessageOptions{
 		FirstLine: MessageLineOptions{
@@ -107,6 +114,7 @@ func Warn(msg string) {
 	})
 }
 
+// Error displays an error message with a red error symbol.
 func Error(msg string) {
 	Message(msg, MessageOptions{
 		FirstLine: MessageLineOptions{

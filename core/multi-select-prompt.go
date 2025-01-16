@@ -28,14 +28,35 @@ type MultiSelectPromptParams[TValue comparable] struct {
 	Context      context.Context
 	Input        *os.File
 	Output       *os.File
-	InitialValue []TValue
 	Options      []*MultiSelectOption[TValue]
+	InitialValue []TValue
 	Filter       bool
 	Required     bool
 	Validate     func(value []TValue) error
 	Render       func(p *MultiSelectPrompt[TValue]) string
 }
 
+// NewMultiSelectPrompt initializes and returns a new instance of MultiSelectPrompt.
+//
+// The user can navigate through options using arrow keys.
+// The user can select multiple options using space key.
+// The prompt returns the value of the selected options.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context for the prompt (default: context.Background).
+//   - Input (*os.File): The input stream for the prompt (default: OSFileSystem).
+//   - Output (*os.File): The output stream for the prompt (default: OSFileSystem).
+//   - Options ([]*MultiSelectOption[TValue]): A list of options for the prompt (default: nil.
+//   - InitialValue ([]TValue): The initial selected values (default: nil.
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - Required (bool): Whether the prompt requires at least one selection (default: false).
+//   - Validate (func(value []TValue) error): Custom validation function for the prompt (default: nil).
+//   - Render (func(p *MultiSelectPrompt[TValue]) string): Custom render function for the prompt (default: nil).
+//
+// Returns:
+//   - *MultiSelectPrompt[TValue]: A new instance of MultiSelectPrompt.
 func NewMultiSelectPrompt[TValue comparable](params MultiSelectPromptParams[TValue]) *MultiSelectPrompt[TValue] {
 	v := validator.NewValidator("MultiSelectPrompt")
 	v.ValidateRender(params.Render)
@@ -85,10 +106,18 @@ func NewMultiSelectPrompt[TValue comparable](params MultiSelectPromptParams[TVal
 	return &p
 }
 
+// moveCursor moves the cursor up or down within the list of options.
+// It ensures the cursor stays within the bounds of the available options.
+//
+// Parameters:
+//   - direction (int): The direction to move the cursor (-1 for up, 1 for down).
 func (p *MultiSelectPrompt[TValue]) moveCursor(direction int) {
 	p.CursorIndex = utils.MinMaxIndex(p.CursorIndex+direction, len(p.Options))
 }
 
+// toggleOption toggles the selection state of the currently highlighted option.
+// If the option is selected, it is deselected, and vice versa.
+// The prompt's value is updated accordingly.
 func (p *MultiSelectPrompt[TValue]) toggleOption() {
 	if p.CursorIndex >= 0 && p.CursorIndex < len(p.Options) {
 		option := p.Options[p.CursorIndex]
@@ -110,6 +139,9 @@ func (p *MultiSelectPrompt[TValue]) toggleOption() {
 	}
 }
 
+// toggleAllOptions toggles the selection state of all options.
+// If all options are selected, they are deselected, and vice versa.
+// The prompt's value is updated accordingly.
 func (p *MultiSelectPrompt[TValue]) toggleAllOptions() {
 	if len(p.Value) == len(p.Options) {
 		p.Value = []TValue{}
@@ -126,6 +158,11 @@ func (p *MultiSelectPrompt[TValue]) toggleAllOptions() {
 	}
 }
 
+// filterOptions updates the search term based on the provided key input and filters the available options.
+// If the search term is empty, it resets the options to the initial list.
+//
+// Parameters:
+//   - key (*Key): The key event that triggered the filtering.
 func (p *MultiSelectPrompt[TValue]) filterOptions(key *Key) {
 	if !p.Filter {
 		return
@@ -170,6 +207,15 @@ func (p *MultiSelectPrompt[TValue]) filterOptions(key *Key) {
 	}
 }
 
+// mapMultiSelectInitialValue maps the initial selected values to the corresponding options.
+// If no initial values are provided, it uses the default selected options.
+//
+// Parameters:
+//   - value ([]TValue): The initial selected values.
+//   - options ([]*MultiSelectOption[TValue]): The list of options to map the values to.
+//
+// Returns:
+//   - []TValue: The mapped initial values.
 func mapMultiSelectInitialValue[TValue comparable](value []TValue, options []*MultiSelectOption[TValue]) []TValue {
 	if len(value) > 0 {
 		for _, value := range value {

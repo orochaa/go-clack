@@ -16,6 +16,25 @@ type PasswordParams struct {
 	Validate     func(value string) error
 }
 
+// Password displays a password input prompt to the user.
+//
+// The prompt displays a message.
+// The user can input a password.
+// The password is masked by asterisks ("*").
+// The prompt returns the password without the mask.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (string): The initial value of the password input (default: "").
+//   - Required (bool): Whether the password input is required (default: false).
+//   - Validate (func(value string) error): Custom validation function for the password (default: nil).
+//
+// Returns:
+//   - string: The password without the mask.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func Password(params PasswordParams) (string, error) {
 	p := core.NewPasswordPrompt(core.PasswordPromptParams{
 		Context:      params.Context,

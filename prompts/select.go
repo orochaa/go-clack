@@ -27,6 +27,26 @@ type SelectParams[TValue comparable] struct {
 	Required     bool
 }
 
+// Select displays a select prompt to the user.
+//
+// The prompt displays a message within their options.
+// The user can navigate through options using arrow keys.
+// The user can select an option using enter key.
+// The prompt returns the value of the selected option.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (TValue): The initial value of the prompt (default: zero value of TValue).
+//   - Options ([]*SelectOption[TValue]): A list of options for the prompt (default: nil).
+//   - Filter (bool): Whether to enable filtering of options (default: false).
+//   - Required (bool): Whether the prompt requires a selection (default: false).
+//
+// Returns:
+//   - TValue: The value of the selected option.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func Select[TValue comparable](params SelectParams[TValue]) (TValue, error) {
 	v := validator.NewValidator("Select")
 	v.ValidateOptions(len(params.Options))

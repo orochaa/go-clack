@@ -19,6 +19,24 @@ type ConfirmParams struct {
 	Inactive     string
 }
 
+// Confirm displays a confirmation prompt to the user.
+//
+// The prompt displays a message and two options: an active and an inactive option.
+// The user can toggle between the two options using arrow keys.
+// The prompt returns the selected value if the user confirms their choice.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (bool): The initial value of the prompt (default: false).
+//   - Active (string): The active option to display (default: "yes").
+//   - Inactive (string): The inactive option to display (default: "no").
+//
+// Returns:
+//   - bool: The selected value if the user confirms their choice.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func Confirm(params ConfirmParams) (bool, error) {
 	p := core.NewConfirmPrompt(core.ConfirmPromptParams{
 		Context:      params.Context,

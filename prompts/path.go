@@ -18,6 +18,27 @@ type PathParams struct {
 	Validate     func(value string) error
 }
 
+// Path displays a input prompt to the user.
+//
+// The prompt displays a message.
+// The user can input a path.
+// The prompt has built-in autosuggestion and autocomplete features.
+// The prompt returns the path.
+// If the user cancels the prompt, it returns an error.
+// If an error occurs during the prompt, it also returns an error.
+//
+// Parameters:
+//   - Context (context.Context): The context in which the prompt is displayed (default: nil).
+//   - Message (string): The message to display to the user (default: "").
+//   - InitialValue (string): The initial value of the path input (default: current working directory).
+//   - OnlyShowDir (bool): Whether to only show directories (default: false).
+//   - Required (bool): Whether the path input is required (default: false).
+//   - FileSystem (FileSystem): The file system implementation to use (default: OSFileSystem).
+//   - Validate (func(value string) error): Custom validation function for the path (default: nil).
+//
+// Returns:
+//   - string: The path value.
+//   - error: An error if the user cancels the prompt or if an error occurs.
 func Path(params PathParams) (string, error) {
 	p := core.NewPathPrompt(core.PathPromptParams{
 		Context:      params.Context,
