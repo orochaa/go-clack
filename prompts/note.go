@@ -8,6 +8,7 @@ import (
 
 	coreUtils "github.com/Mist3rBru/go-clack/core/utils"
 	"github.com/Mist3rBru/go-clack/prompts/symbols"
+	"github.com/Mist3rBru/go-clack/prompts/theme"
 	"github.com/Mist3rBru/go-clack/third_party/picocolors"
 )
 
@@ -27,19 +28,15 @@ func Note(msg string, options NoteOptions) {
 		lineLength = max(coreUtils.StrLength(line)+4, lineLength)
 	}
 
-	header := noteHeader(options.Title, lineLength)
-	body := noteBody(msg, lineLength)
-	footer := noteFooter(lineLength)
-
-	box := strings.Join([]string{
+	frame := theme.NewFrame()
+	frame.WriteLn(
 		picocolors.Gray(symbols.BAR),
-		header,
-		body,
-		footer,
-		"",
-	}, "\r\n")
+		noteHeader(options.Title, lineLength),
+		noteBody(msg, lineLength),
+		noteFooter(lineLength),
+	)
 
-	options.Output.Write([]byte(box))
+	options.Output.Write(frame.Bytes())
 }
 
 func noteHeader(title string, lineLength int) string {

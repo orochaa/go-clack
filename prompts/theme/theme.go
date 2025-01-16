@@ -23,20 +23,20 @@ type ThemeParams[TValue ThemeValue] struct {
 func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 	ctx := params.Ctx
 
+	frame := NewFrame()
+	frame.WriteLn(picocolors.Gray(symbols.BAR))
+
 	symbolColor := SymbolColor(ctx.State)
 	barColor := BarColor(ctx.State)
-
-	title := strings.Join([]string{
-		picocolors.Gray(symbols.BAR),
-		ctx.FormatLines(strings.Split(params.Message, "\n"), core.FormatLinesOptions{
-			FirstLine: core.FormatLineOptions{
-				Start: symbolColor(symbols.State(ctx.State)),
-			},
-			NewLine: core.FormatLineOptions{
-				Start: barColor(symbols.BAR),
-			},
-		}),
-	}, "\r\n")
+	title := ctx.FormatLines(strings.Split(params.Message, "\n"), core.FormatLinesOptions{
+		FirstLine: core.FormatLineOptions{
+			Start: symbolColor(symbols.State(ctx.State)),
+		},
+		NewLine: core.FormatLineOptions{
+			Start: barColor(symbols.BAR),
+		},
+	})
+	frame.WriteLn(title)
 
 	var valueWithCursor string
 	if params.Placeholder != "" && (params.ValueWithCursor == "" || (ctx.State == core.InitialState && params.ValueWithCursor == "█")) {
@@ -52,19 +52,20 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				Start: barColor(symbols.BAR),
 			},
 		})
-		if ctx.Error == "" {
-			return strings.Join([]string{title, value}, "\r\n")
+		frame.WriteLn(value)
+
+		if ctx.Error != "" {
+			err := ctx.FormatLines(strings.Split(ctx.Error, "\n"), core.FormatLinesOptions{
+				Default: core.FormatLineOptions{
+					Start: barColor(symbols.BAR),
+					Style: picocolors.Yellow,
+				},
+				LastLine: core.FormatLineOptions{
+					Start: barColor(symbols.BAR_END),
+				},
+			})
+			frame.WriteLn(err)
 		}
-		err := ctx.FormatLines(strings.Split(ctx.Error, "\n"), core.FormatLinesOptions{
-			Default: core.FormatLineOptions{
-				Start: barColor(symbols.BAR),
-				Style: picocolors.Yellow,
-			},
-			LastLine: core.FormatLineOptions{
-				Start: barColor(symbols.BAR_END),
-			},
-		})
-		return strings.Join([]string{title, value, err}, "\r\n")
 
 	case core.CancelState:
 		value := ctx.FormatLines(strings.Split(params.Value, "\n"), core.FormatLinesOptions{
@@ -75,11 +76,12 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				},
 			},
 		})
-		if params.Value == "" {
-			return strings.Join([]string{title, value}, "\r\n")
+		frame.WriteLn(value)
+
+		if params.Value != "" {
+			end := barColor(symbols.BAR)
+			frame.WriteLn(end)
 		}
-		end := barColor(symbols.BAR)
-		return strings.Join([]string{title, value, end}, "\r\n")
 
 	case core.SubmitState:
 		value := ctx.FormatLines(strings.Split(params.Value, "\n"), core.FormatLinesOptions{
@@ -88,7 +90,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				Style: picocolors.Dim,
 			},
 		})
-		return strings.Join([]string{title, value}, "\r\n")
+		frame.WriteLn(value)
 
 	case core.ValidateState:
 		value := ctx.FormatLines(strings.Split(params.Value, "\n"), core.FormatLinesOptions{
@@ -99,7 +101,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 		})
 		dots := strings.Repeat(".", int(ctx.ValidationDuration.Seconds())%4)
 		validatingMsg := barColor(symbols.BAR_END) + " " + picocolors.Dim("validating"+dots)
-		return strings.Join([]string{title, value, validatingMsg}, "\r\n")
+		frame.WriteLn(value, validatingMsg)
 
 	default:
 		value := ctx.FormatLines(strings.Split(valueWithCursor, "\n"), core.FormatLinesOptions{
@@ -108,9 +110,12 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 			},
 		})
 		end := barColor(symbols.BAR_END)
-
-		return strings.Join([]string{title, value, end}, "\r\n")
+		frame.WriteLn(value, end)
 	}
+
+	frame.RemoveTrailingCRLF()
+
+	return frame.String()
 }
 
 func SymbolColor(state core.State) func(input string) string {
