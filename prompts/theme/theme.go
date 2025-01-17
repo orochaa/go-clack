@@ -24,8 +24,8 @@ type ThemeParams[TValue ThemeValue] struct {
 func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 	ctx := params.Context
 
-	frame := core.NewFrame()
-	frame.WriteLn(picocolors.Gray(symbols.BAR))
+	frame := make([]string, 0, 4)
+	frame = append(frame, picocolors.Gray(symbols.BAR))
 
 	symbolColor := SymbolColor(ctx.State)
 	barColor := BarColor(ctx.State)
@@ -37,7 +37,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 			Start: barColor(symbols.BAR),
 		},
 	})
-	frame.WriteLn(title)
+	frame = append(frame, title)
 
 	var valueWithCursor string
 	if params.Placeholder != "" && (params.ValueWithCursor == "" || (ctx.State == core.InitialState && params.ValueWithCursor == "█")) {
@@ -53,7 +53,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				Start: barColor(symbols.BAR),
 			},
 		})
-		frame.WriteLn(value)
+		frame = append(frame, value)
 
 		if ctx.Error != "" {
 			err := ctx.FormatLines(utils.SplitLines(ctx.Error), core.FormatLinesOptions{
@@ -65,7 +65,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 					Start: barColor(symbols.BAR_END),
 				},
 			})
-			frame.WriteLn(err)
+			frame = append(frame, err)
 		}
 
 	case core.CancelState:
@@ -77,11 +77,11 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				},
 			},
 		})
-		frame.WriteLn(value)
+		frame = append(frame, value)
 
 		if params.Value != "" {
 			end := barColor(symbols.BAR)
-			frame.WriteLn(end)
+			frame = append(frame, end)
 		}
 
 	case core.SubmitState:
@@ -91,7 +91,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 				Style: picocolors.Dim,
 			},
 		})
-		frame.WriteLn(value)
+		frame = append(frame, value)
 
 	case core.ValidateState:
 		value := ctx.FormatLines(utils.SplitLines(params.Value), core.FormatLinesOptions{
@@ -102,7 +102,7 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 		})
 		dots := strings.Repeat(".", int(ctx.ValidationDuration.Seconds())%4)
 		validatingMsg := barColor(symbols.BAR_END) + " " + picocolors.Dim("validating"+dots)
-		frame.WriteLn(value, validatingMsg)
+		frame = append(frame, value, validatingMsg)
 
 	default:
 		value := ctx.FormatLines(utils.SplitLines(valueWithCursor), core.FormatLinesOptions{
@@ -111,12 +111,10 @@ func ApplyTheme[TValue ThemeValue](params ThemeParams[TValue]) string {
 			},
 		})
 		end := barColor(symbols.BAR_END)
-		frame.WriteLn(value, end)
+		frame = append(frame, value, end)
 	}
 
-	frame.RemoveTrailingCRLF()
-
-	return frame.String()
+	return strings.Join(frame, "\r\n")
 }
 
 func SymbolColor(state core.State) func(input string) string {

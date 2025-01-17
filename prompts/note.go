@@ -6,9 +6,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Mist3rBru/go-clack/core"
 	"github.com/Mist3rBru/go-clack/core/utils"
-	coreUtils "github.com/Mist3rBru/go-clack/core/utils"
 	"github.com/Mist3rBru/go-clack/prompts/symbols"
 	"github.com/Mist3rBru/go-clack/third_party/picocolors"
 )
@@ -24,20 +22,20 @@ func Note(msg string, options NoteOptions) {
 		options.Output = os.Stdout
 	}
 
-	lineLength := coreUtils.StrLength(options.Title) + 7
+	lineLength := utils.StrLength(options.Title) + 7
 	for _, line := range utils.SplitLines(msg) {
-		lineLength = max(coreUtils.StrLength(line)+4, lineLength)
+		lineLength = max(utils.StrLength(line)+4, lineLength)
 	}
 
-	frame := core.NewFrame()
-	frame.WriteLn(
+	frame := strings.Join([]string{
 		picocolors.Gray(symbols.BAR),
 		noteHeader(options.Title, lineLength),
 		noteBody(msg, lineLength),
 		noteFooter(lineLength),
-	)
+		"",
+	}, "\r\n")
 
-	options.Output.Write(frame.Bytes())
+	options.Output.Write([]byte(frame))
 }
 
 func noteHeader(title string, lineLength int) string {
@@ -49,7 +47,7 @@ func noteHeader(title string, lineLength int) string {
 	}
 
 	left := picocolors.Green(symbols.STEP_SUBMIT)
-	topLength := max(lineLength-coreUtils.StrLength(title)-2, 0)
+	topLength := max(lineLength-utils.StrLength(title)-2, 0)
 	top := picocolors.Gray(strings.Repeat(symbols.BAR_H, topLength))
 	right := picocolors.Gray(symbols.CORNER_TOP_RIGHT)
 	return fmt.Sprintf("%s %s %s%s", left, title, top, right)
@@ -62,7 +60,7 @@ func noteBody(msg string, lineLength int) string {
 	body := make([]string, len(lines))
 
 	for i, line := range lines {
-		whitespace := strings.Repeat(" ", max(lineLength-2-coreUtils.StrLength(line), 1))
+		whitespace := strings.Repeat(" ", max(lineLength-2-utils.StrLength(line), 1))
 		body[i] = fmt.Sprintf("%s  %s%s%s", bar, line, whitespace, bar)
 	}
 
