@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/Mist3rBru/go-clack/core"
+	"github.com/Mist3rBru/go-clack/core/utils"
 	"github.com/Mist3rBru/go-clack/prompts/symbols"
 	"github.com/Mist3rBru/go-clack/third_party/picocolors"
 )
@@ -15,23 +16,23 @@ type MessageOptions = core.FormatLinesOptions
 
 func Message(msg string, options MessageOptions) {
 	p := &core.Prompt[string]{}
-	formattedMsg := p.FormatLines(strings.Split(msg, "\n"), options)
+	formattedMsg := p.FormatLines(utils.SplitLines(msg), options)
 	os.Stdout.WriteString(fmt.Sprintf("%s\r\n%s\r\n", picocolors.Gray(symbols.BAR), formattedMsg))
 }
 
 func styleMsg(msg string, style func(msg string) string) string {
-	parts := strings.Split(msg, "\n")
+	parts := utils.SplitLines(msg)
 	styledParts := make([]string, len(parts))
 	for i, part := range parts {
 		styledParts[i] = style(part)
 	}
-	return strings.Join(styledParts, "\n")
+	return strings.Join(styledParts, "\r\n")
 }
 
 // Intro displays an introductory message.
 func Intro(msg string) {
 	p := &core.Prompt[string]{}
-	formattedMsg := p.FormatLines(strings.Split(msg, "\n"), MessageOptions{
+	formattedMsg := p.FormatLines(utils.SplitLines(msg), MessageOptions{
 		FirstLine: MessageLineOptions{
 			Start: picocolors.Gray(symbols.BAR_START),
 		},
@@ -56,7 +57,7 @@ func Cancel(msg string) {
 
 // Outro displays a closing message.
 func Outro(msg string) {
-	Message("\n"+msg, MessageOptions{
+	Message("\r\n"+msg, MessageOptions{
 		Default: MessageLineOptions{
 			Start: picocolors.Gray(symbols.BAR),
 		},

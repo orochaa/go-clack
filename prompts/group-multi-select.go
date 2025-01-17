@@ -97,7 +97,7 @@ func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) 
 					if option.IsGroup {
 						radioOptions[i] = groupOption(option, p.IsGroupSelected(option), i == p.CursorIndex, p.DisabledGroups)
 						if params.SpacedGroups && i > 0 {
-							radioOptions[i] = "\n" + radioOptions[i]
+							radioOptions[i] = "\r\n" + radioOptions[i]
 						}
 						continue
 					}

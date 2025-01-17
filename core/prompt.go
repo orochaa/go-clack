@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Mist3rBru/go-clack/core/utils"
 	"github.com/Mist3rBru/go-clack/core/validator"
 	"github.com/Mist3rBru/go-clack/third_party/sisteransi"
 
@@ -256,8 +257,8 @@ func (p *Prompt[TValue]) DiffLines(oldFrame, newFrame string) []int {
 		return diff
 	}
 
-	oldLines := strings.Split(oldFrame, "\n")
-	newLines := strings.Split(newFrame, "\n")
+	oldLines := utils.SplitLines(oldFrame)
+	newLines := utils.SplitLines(newFrame)
 	for i := range max(len(oldLines), len(newLines)) {
 		if i >= len(oldLines) || i >= len(newLines) || oldLines[i] != newLines[i] {
 			diff = append(diff, i)
@@ -276,10 +277,6 @@ func (p *Prompt[TValue]) Size() (width int, height int, err error) {
 func (p *Prompt[TValue]) render() {
 	frame := p.Render(p)
 
-	if lines := strings.Split(frame, "\r\n"); len(lines) == 1 {
-		frame = strings.Join(strings.Split(frame, "\n"), "\r\n")
-	}
-
 	if p.State == InitialState {
 		p.output.WriteString(sisteransi.HideCursor())
 		p.output.WriteString(frame)
@@ -293,15 +290,15 @@ func (p *Prompt[TValue]) render() {
 
 	diff := p.DiffLines(frame, p.Frame)
 	diffLineIndex := diff[0]
-	prevFrameLines := strings.Split((p.Frame), "\n")
+	prevFrameLines := utils.SplitLines((p.Frame))
 
 	// Move to first diff line
 	p.output.WriteString(sisteransi.MoveCursor(-(len(prevFrameLines) - 1), -999))
 	p.output.WriteString(sisteransi.MoveCursor(diffLineIndex, 0))
 	p.output.WriteString(sisteransi.EraseDown())
-	lines := strings.Split(frame, "\n")
+	lines := utils.SplitLines(frame)
 	newLines := lines[diffLineIndex:]
-	p.output.WriteString(strings.Join(newLines, "\n"))
+	p.output.WriteString(strings.Join(newLines, "\r\n"))
 	p.Frame = frame
 }
 

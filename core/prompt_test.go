@@ -267,48 +267,48 @@ func TestLimitLines(t *testing.T) {
 		{
 			description: "do not limit lines with frame's height <= terminal's height",
 			frameHeight: 10,
-			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}, "\n"),
+			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}, "\r\n"),
 		},
 		{
 			description: "limit lines with frame's height > terminal's height",
 			frameHeight: 11,
-			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "..."}, "\n"),
+			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "..."}, "\r\n"),
 		},
 		{
 			description: "limit lines with usedLine + frame's height > terminal's height",
 			frameHeight: 10,
 			usedLines:   3,
-			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "..."}, "\n"),
+			expected:    strings.Join([]string{"1", "2", "3", "4", "5", "6", "..."}, "\r\n"),
 		},
 		{
 			description: "limit lines with cursor on the middle start of the list",
 			frameHeight: 20,
 			cursorIndex: 8,
-			expected:    strings.Join([]string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."}, "\n"),
+			expected:    strings.Join([]string{"...", "3", "4", "5", "6", "7", "8", "9", "10", "..."}, "\r\n"),
 		},
 		{
 			description: "limit lines with cursor on the middle of the list",
 			frameHeight: 20,
 			cursorIndex: 10,
-			expected:    strings.Join([]string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."}, "\n"),
+			expected:    strings.Join([]string{"...", "5", "6", "7", "8", "9", "10", "11", "12", "..."}, "\r\n"),
 		},
 		{
 			description: "limit lines with cursor on the middle end of the list",
 			frameHeight: 20,
 			cursorIndex: 16,
-			expected:    strings.Join([]string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."}, "\n"),
+			expected:    strings.Join([]string{"...", "11", "12", "13", "14", "15", "16", "17", "18", "..."}, "\r\n"),
 		},
 		{
 			description: "limit lines with cursor on the end of the list",
 			frameHeight: 20,
 			cursorIndex: 17,
-			expected:    strings.Join([]string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"}, "\n"),
+			expected:    strings.Join([]string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"}, "\r\n"),
 		},
 		{
 			description: "limit lines with cursor at the end of the list",
 			frameHeight: 20,
 			cursorIndex: 20,
-			expected:    strings.Join([]string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"}, "\n"),
+			expected:    strings.Join([]string{"...", "12", "13", "14", "15", "16", "17", "18", "19", "20"}, "\r\n"),
 		},
 	}
 

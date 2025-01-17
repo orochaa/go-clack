@@ -68,7 +68,7 @@ func Path(params PathParams) (string, error) {
 						hintOptions += " "
 					}
 				}
-				valueWithCursor += "\n" + hintOptions
+				valueWithCursor += "\r\n" + hintOptions
 			}
 
 			return theme.ApplyTheme(theme.ThemeParams[string]{

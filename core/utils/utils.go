@@ -59,3 +59,41 @@ func MinMaxIndex(index int, max int) int {
 	}
 	return index
 }
+
+// SplitLines splits a string into a slice of lines.
+// It handles both "\n" and "\r\n" line endings.
+// If the string doesn't end with a newline, the last line is still appended to the result.
+func SplitLines(str string) []string {
+	if len(str) == 0 {
+		return []string{""}
+	}
+
+	var lines []string
+	start := 0
+
+	for i := 0; i < len(str); i++ {
+		if str[i] == '\r' {
+			lines = append(lines, str[start:i])
+			if i+1 < len(str) && str[i+1] == '\n' {
+				// Skip next \n
+				i++
+			}
+			start = i + 1
+		} else if str[i] == '\n' {
+			lines = append(lines, str[start:i])
+			start = i + 1
+		}
+	}
+
+	if start < len(str) {
+		lines = append(lines, str[start:])
+	}
+
+	lastChar := str[len(str)-1]
+	lastLine := lines[len(lines)-1]
+	if lastLine != "" && (lastChar == '\r' || lastChar == '\n') {
+		lines = append(lines, "")
+	}
+
+	return lines
+}

@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Mist3rBru/go-clack/core/utils"
 	"github.com/Mist3rBru/go-clack/prompts/symbols"
 	isunicodesupported "github.com/Mist3rBru/go-clack/third_party/is-unicode-supported"
 	"github.com/Mist3rBru/go-clack/third_party/picocolors"
@@ -77,9 +78,9 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			return
 		}
 		if isCI {
-			write("\n")
+			write("\r\n")
 		}
-		prevLines := strings.Split(prevMessage, "\n")
+		prevLines := utils.SplitLines(prevMessage)
 		write(sisteransi.MoveCursor(-len(prevLines)+1, -999))
 		write(sisteransi.EraseDown())
 	}
@@ -87,7 +88,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 	return &SpinnerController{
 		Start: func(msg string) {
 			write(sisteransi.HideCursor())
-			write(picocolors.Gray(symbols.BAR) + "\n")
+			write(picocolors.Gray(symbols.BAR) + "\r\n")
 
 			frameIndex = 0
 			dotsTimer = 0
