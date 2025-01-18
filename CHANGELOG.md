@@ -1,4 +1,62 @@
 
+<a name="v0.1.16"></a>
+## [v0.1.16](https://github.com/Mist3rBru/go-clack/compare/v0.1.15...v0.1.16) (2025-01-17)
+
+### 🚀 Features
+
+* add custom SplitLines function
+* add context support
+* **core:** add support for custom aliases
+* **prompts:** add theme.Frame
+* **prompts:** add support for custom input/output to prompts
+* **prompts:** adapt spinner to CI environment
+
+### 🧪 Tests
+
+* **core:** add settings tests
+
+### 🛠️ Refactors
+
+* remove Frame for performance issues
+* move Frame to core package
+* use block character as cursor placeholder
+* **core:** improve slice manipulation
+* **core:** add action handler
+
+### 📖 Documentation
+
+* add custom keys example
+* add file selection example
+
+### 🏡 Chore
+
+* add inline docs to prompts and their methods
+* update dependencies
+
+
+<a name="v0.1.15"></a>
+## [v0.1.15](https://github.com/Mist3rBru/go-clack/compare/v0.1.14...v0.1.15) (2024-11-13)
+
+### 🚀 Features
+
+* **core:** add Prompt.Size helper
+
+### 🩹 Fixes
+
+* **core:** handle SpaceKey input on text prompts
+
+### 🛠️ Refactors
+
+* **core:** improve StrLength perf
+
+### 🏡 Chore
+
+* add LICENSE ([#4](https://github.com/Mist3rBru/go-clack/issues/4))
+* add LICENSE
+* add github templates
+* update changelog
+
+
 <a name="v0.1.14"></a>
 ## [v0.1.14](https://github.com/Mist3rBru/go-clack/compare/v0.1.13...v0.1.14) (2024-08-23)
 
