@@ -3,7 +3,6 @@ package prompts
 import (
 	"fmt"
 	"io"
-	"math"
 	"os"
 	"regexp"
 	"strings"
@@ -16,18 +15,7 @@ import (
 	"github.com/Mist3rBru/go-clack/third_party/sisteransi"
 )
 
-type Timer interface {
-	Sleep(duration time.Duration)
-}
-
-type defaultTimer struct{}
-
-func (t *defaultTimer) Sleep(duration time.Duration) {
-	time.Sleep(duration)
-}
-
 type SpinnerOptions struct {
-	Timer  Timer
 	Output io.Writer
 }
 
@@ -42,30 +30,30 @@ type SpinnerController struct {
 
 // Spinner initializes and returns a SpinnerController with the provided options.
 func Spinner(options SpinnerOptions) *SpinnerController {
-	done := make(chan any)
-
-	if options.Timer == nil {
-		options.Timer = &defaultTimer{}
-	}
 	if options.Output == nil {
 		options.Output = os.Stdout
 	}
 
+	var ticker *time.Ticker
+
 	var message, prevMessage string
 
 	var frames []string
-	var frameIndex, frameInterval int
+	var frameIndex int
+	var frameInterval time.Duration
 
 	const dotsInterval float32 = 0.125
 	var dotsTimer float32
 
 	if isunicodesupported.IsUnicodeSupported() {
 		frames = []string{"◒", "◐", "◓", "◑"}
-		frameInterval = 80
+		frameInterval = 80 * time.Millisecond
 	} else {
 		frames = []string{"•", "o", "O", "0"}
-		frameInterval = 120
+		frameInterval = 120 * time.Millisecond
 	}
+
+	ticker = time.NewTicker(frameInterval)
 
 	isCI := os.Getenv("CI") == "true"
 
@@ -95,35 +83,31 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			message = parseMessage(msg)
 
 			go func() {
-				for {
-					select {
-					case <-done:
-						return
-					default:
-						if isCI && message == prevMessage {
-							continue
-						}
-						clearPrevMessage()
-						prevMessage = message
-						frame := picocolors.Magenta(frames[frameIndex])
-						var loadingDots string
-						if isCI {
-							loadingDots = "..."
-						} else {
-							loadingDots = strings.Repeat(".", min(int(math.Floor(float64(dotsTimer))), 3))
-						}
-						write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
-						if frameIndex+1 < len(frames) {
-							frameIndex++
-						} else {
-							frameIndex = 0
-						}
-						if int(dotsTimer) < 4 {
-							dotsTimer += dotsInterval
-						} else {
-							dotsTimer = 0
-						}
-						options.Timer.Sleep(time.Duration(frameInterval) * time.Millisecond)
+				ticker.Reset(frameInterval)
+
+				for range ticker.C {
+					if isCI && message == prevMessage {
+						continue
+					}
+					clearPrevMessage()
+					prevMessage = message
+					frame := picocolors.Magenta(frames[frameIndex])
+					var loadingDots string
+					if isCI {
+						loadingDots = "..."
+					} else {
+						loadingDots = strings.Repeat(".", min(int(dotsTimer), 3))
+					}
+					write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
+					if frameIndex+1 < len(frames) {
+						frameIndex++
+					} else {
+						frameIndex = 0
+					}
+					if int(dotsTimer) < 4 {
+						dotsTimer += dotsInterval
+					} else {
+						dotsTimer = 0
 					}
 				}
 			}()
@@ -132,7 +116,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			message = parseMessage(msg)
 		},
 		Stop: func(msg string, code int) {
-			close(done)
+			ticker.Stop()
 			clearPrevMessage()
 			var step string
 			switch code {

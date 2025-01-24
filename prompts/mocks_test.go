@@ -83,12 +83,3 @@ func (w *MockWriter) Write(data []byte) (int, error) {
 	w.mu.Unlock()
 	return 0, nil
 }
-
-func (w *MockWriter) HaveBeenCalledWith(str string) string {
-	for _, data := range w.Data {
-		if data == str {
-			return data
-		}
-	}
-	return ""
-}

@@ -25,5 +25,4 @@ func SpinnerExample() {
 
 	s.Stop("Done", 0)
 	prompts.Outro("spinner stop...")
-
 }
