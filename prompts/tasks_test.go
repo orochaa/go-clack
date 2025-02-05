@@ -15,6 +15,7 @@ func TestTasksStart(t *testing.T) {
 	startTimes := 0
 	task := func(message func(msg string)) (string, error) {
 		startTimes++
+		time.Sleep(frameInterval)
 		return "", nil
 	}
 	w := &MockWriter{}
@@ -23,7 +24,7 @@ func TestTasksStart(t *testing.T) {
 		{Title: "Foo", Task: task},
 		{Title: "Bar", Task: task},
 		{Title: "Baz", Task: task},
-	}, prompts.SpinnerOptions{w})
+	}, prompts.SpinnerOptions{nil, w})
 	time.Sleep(3 * frameInterval)
 
 	expectedList := []string{
@@ -40,7 +41,7 @@ func TestTasksSubmit(t *testing.T) {
 	startTimes := 0
 	task := func(message func(msg string)) (string, error) {
 		startTimes++
-		time.Sleep(time.Millisecond)
+		time.Sleep(frameInterval)
 		return "", nil
 	}
 	w := &MockWriter{}
@@ -49,7 +50,7 @@ func TestTasksSubmit(t *testing.T) {
 		{Title: "Foo", Task: task},
 		{Title: "Bar", Task: task},
 		{Title: "Baz", Task: task},
-	}, prompts.SpinnerOptions{w})
+	}, prompts.SpinnerOptions{nil, w})
 	time.Sleep(3 * frameInterval)
 
 	expectedList := []string{
@@ -70,7 +71,9 @@ func TestTasksUpdateMessage(t *testing.T) {
 	}
 	w := &MockWriter{}
 
-	prompts.Tasks([]prompts.Task{{Title: "Foo", Task: task}}, prompts.SpinnerOptions{w})
+	prompts.Tasks([]prompts.Task{
+		{Title: "Foo", Task: task},
+	}, prompts.SpinnerOptions{nil, w})
 	time.Sleep(2 * frameInterval)
 
 	assert.NotContains(t, w.Data, "◒ Bar")
@@ -86,7 +89,7 @@ func TestTasksWithDisabledTask(t *testing.T) {
 
 	prompts.Tasks([]prompts.Task{
 		{Title: "Foo", Task: task, Disabled: true},
-	}, prompts.SpinnerOptions{w})
+	}, prompts.SpinnerOptions{nil, w})
 	time.Sleep(2 * frameInterval)
 
 	assert.Equal(t, 0, counter)
@@ -98,7 +101,9 @@ func TestTasksTaskWithError(t *testing.T) {
 	}
 	w := &MockWriter{}
 
-	prompts.Tasks([]prompts.Task{{Title: "Foo", Task: task}}, prompts.SpinnerOptions{w})
+	prompts.Tasks([]prompts.Task{
+		{Title: "Foo", Task: task},
+	}, prompts.SpinnerOptions{nil, w})
 	time.Sleep(2 * frameInterval)
 
 	assert.Contains(t, w.Data, fmt.Sprintf("%s task error\n", symbols.STEP_CANCEL))

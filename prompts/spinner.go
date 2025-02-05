@@ -1,6 +1,7 @@
 package prompts
 
 import (
+	"context"
 	"fmt"
 	"io"
 	"os"
@@ -16,7 +17,8 @@ import (
 )
 
 type SpinnerOptions struct {
-	Output io.Writer
+	Context context.Context
+	Output  io.Writer
 }
 
 type SpinnerController struct {
@@ -30,6 +32,9 @@ type SpinnerController struct {
 
 // Spinner initializes and returns a SpinnerController with the provided options.
 func Spinner(options SpinnerOptions) *SpinnerController {
+	if options.Context == nil {
+		options.Context = context.Background()
+	}
 	if options.Output == nil {
 		options.Output = os.Stdout
 	}
@@ -53,6 +58,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 		frameInterval = 120 * time.Millisecond
 	}
 
+	ctx, stopSpinner := context.WithCancel(options.Context)
 	ticker = time.NewTicker(frameInterval)
 
 	isCI := os.Getenv("CI") == "true"
@@ -85,29 +91,34 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			go func() {
 				ticker.Reset(frameInterval)
 
-				for range ticker.C {
-					if isCI && message == prevMessage {
-						continue
-					}
-					clearPrevMessage()
-					prevMessage = message
-					frame := picocolors.Magenta(frames[frameIndex])
-					var loadingDots string
-					if isCI {
-						loadingDots = "..."
-					} else {
-						loadingDots = strings.Repeat(".", min(int(dotsTimer), 3))
-					}
-					write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
-					if frameIndex+1 < len(frames) {
-						frameIndex++
-					} else {
-						frameIndex = 0
-					}
-					if int(dotsTimer) < 4 {
-						dotsTimer += dotsInterval
-					} else {
-						dotsTimer = 0
+				for {
+					select {
+					case <-ctx.Done():
+						ticker.Stop()
+					case <-ticker.C:
+						if isCI && message == prevMessage {
+							continue
+						}
+						clearPrevMessage()
+						prevMessage = message
+						frame := picocolors.Magenta(frames[frameIndex])
+						var loadingDots string
+						if isCI {
+							loadingDots = "..."
+						} else {
+							loadingDots = strings.Repeat(".", min(int(dotsTimer), 3))
+						}
+						write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
+						if frameIndex+1 < len(frames) {
+							frameIndex++
+						} else {
+							frameIndex = 0
+						}
+						if int(dotsTimer) < 4 {
+							dotsTimer += dotsInterval
+						} else {
+							dotsTimer = 0
+						}
 					}
 				}
 			}()
@@ -116,7 +127,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			message = parseMessage(msg)
 		},
 		Stop: func(msg string, code int) {
-			ticker.Stop()
+			stopSpinner()
 			clearPrevMessage()
 			var step string
 			switch code {
