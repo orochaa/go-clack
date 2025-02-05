@@ -22,6 +22,8 @@ type SpinnerIndicator int
 const (
 	// SpinnerDotsIndicator shows a loading animation with dots.
 	SpinnerDotsIndicator SpinnerIndicator = iota
+	// SpinnerDotsIndicator shows static dots.
+	SpinnerStaticDotsIndicator SpinnerIndicator = iota
 	// SpinnerTimerIndicator displays a timer alongside the loading message.
 	SpinnerTimerIndicator
 )
@@ -45,6 +47,8 @@ type SpinnerController struct {
 
 // Spinner initializes and returns a SpinnerController with the provided options.
 func Spinner(options SpinnerOptions) *SpinnerController {
+	isCI := os.Getenv("CI") == "true"
+
 	if options.Context == nil {
 		options.Context = context.Background()
 	}
@@ -66,6 +70,9 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			options.FrameInterval = 120 * time.Millisecond
 		}
 	}
+	if isCI {
+		options.Indicator = SpinnerStaticDotsIndicator
+	}
 
 	var ctx context.Context
 	var ticker *time.Ticker
@@ -78,8 +85,6 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 	var frameIndex int
 
 	ticker = time.NewTicker(options.FrameInterval)
-
-	isCI := os.Getenv("CI") == "true"
 
 	write := func(str string) {
 		options.Output.Write([]byte(str))
@@ -108,7 +113,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			frameIndex = 0
 			startTime = time.Now()
 
-			message = parseMessage(msg)
+			message = trimMessageDots(msg)
 
 			go func() {
 				for {
@@ -122,15 +127,9 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 						clearPrevMessage()
 						prevMessage = message
 						frame := picocolors.Magenta(options.Frames[frameIndex])
-						if isCI {
-							write(fmt.Sprintf("%s %s...", frame, message))
-						} else if options.Indicator == SpinnerTimerIndicator {
-							duration := time.Since(startTime)
-							write(fmt.Sprintf("%s %s %s", frame, message, formatTimer(duration)))
-						} else {
-							duration := time.Since(startTime)
-							write(fmt.Sprintf("%s %s%s", frame, message, formatDots(duration)))
-						}
+						duration := time.Since(startTime)
+						formattedFrame := formatSpinnerFrame(options.Indicator, frame, message, duration)
+						write(formattedFrame)
 						if frameIndex+1 < len(options.Frames) {
 							frameIndex++
 						} else {
@@ -141,7 +140,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			}()
 		},
 		Message: func(msg string) {
-			message = parseMessage(msg)
+			message = trimMessageDots(msg)
 		},
 		Stop: func(msg string, code int) {
 			stopSpinner()
@@ -156,7 +155,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 				step = picocolors.Red(symbols.STEP_ERROR)
 			}
 			if msg != "" {
-				message = parseMessage(msg)
+				message = trimMessageDots(msg)
 			}
 			write(sisteransi.ShowCursor())
 			write(fmt.Sprintf("%s %s\n", step, message))
@@ -164,21 +163,26 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 	}
 }
 
-func parseMessage(msg string) string {
+func trimMessageDots(msg string) string {
 	dotsRegex := regexp.MustCompile(`\.+$`)
 	return dotsRegex.ReplaceAllString(msg, "")
 }
 
-func formatTimer(duration time.Duration) string {
-	min := int(duration.Minutes())
-	secs := int(duration.Seconds()) - (min * 60)
-	if min > 0 {
-		return fmt.Sprintf("[%dm %ds]", min, secs)
+func formatSpinnerFrame(indicator SpinnerIndicator, frame string, message string, duration time.Duration) string {
+	switch indicator {
+	case SpinnerDotsIndicator:
+		dotsCounter := int(duration.Seconds()) % 4
+		return fmt.Sprintf("%s %s%s", frame, message, strings.Repeat(".", dotsCounter))
+	case SpinnerStaticDotsIndicator:
+		return fmt.Sprintf("%s %s...", frame, message)
+	case SpinnerTimerIndicator:
+		min := int(duration.Minutes())
+		secs := int(duration.Seconds()) - (min * 60)
+		if min > 0 {
+			return fmt.Sprintf("%s %s [%dm %ds]", frame, message, min, secs)
+		}
+		return fmt.Sprintf("%s %s [%ds]", frame, message, secs)
+	default:
+		return fmt.Sprintf("%s %s", frame, message)
 	}
-	return fmt.Sprintf("[%ds]", secs)
-}
-
-func formatDots(duration time.Duration) string {
-	dotsCounter := int(duration.Seconds()) % 4
-	return strings.Repeat(".", dotsCounter)
 }
