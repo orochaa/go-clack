@@ -27,9 +27,11 @@ const (
 )
 
 type SpinnerOptions struct {
-	Context   context.Context
-	Output    io.Writer
-	Indicator SpinnerIndicator
+	Context       context.Context
+	Output        io.Writer
+	Indicator     SpinnerIndicator
+	Frames        []string
+	FrameInterval time.Duration
 }
 
 type SpinnerController struct {
@@ -49,6 +51,21 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 	if options.Output == nil {
 		options.Output = os.Stdout
 	}
+	isUnicodeSupported := isunicodesupported.IsUnicodeSupported()
+	if options.Frames == nil {
+		if isUnicodeSupported {
+			options.Frames = []string{"◒", "◐", "◓", "◑"}
+		} else {
+			options.Frames = []string{"•", "o", "O", "0"}
+		}
+	}
+	if options.FrameInterval == 0 {
+		if isUnicodeSupported {
+			options.FrameInterval = 80 * time.Millisecond
+		} else {
+			options.FrameInterval = 120 * time.Millisecond
+		}
+	}
 
 	var ctx context.Context
 	var ticker *time.Ticker
@@ -58,19 +75,9 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 
 	var message, prevMessage string
 
-	var frames []string
 	var frameIndex int
-	var frameInterval time.Duration
 
-	if isunicodesupported.IsUnicodeSupported() {
-		frames = []string{"◒", "◐", "◓", "◑"}
-		frameInterval = 80 * time.Millisecond
-	} else {
-		frames = []string{"•", "o", "O", "0"}
-		frameInterval = 120 * time.Millisecond
-	}
-
-	ticker = time.NewTicker(frameInterval)
+	ticker = time.NewTicker(options.FrameInterval)
 
 	isCI := os.Getenv("CI") == "true"
 
@@ -96,7 +103,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			write(picocolors.Gray(symbols.BAR) + "\r\n")
 
 			ctx, stopSpinner = context.WithCancel(options.Context)
-			ticker.Reset(frameInterval)
+			ticker.Reset(options.FrameInterval)
 
 			frameIndex = 0
 			startTime = time.Now()
@@ -114,7 +121,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 						}
 						clearPrevMessage()
 						prevMessage = message
-						frame := picocolors.Magenta(frames[frameIndex])
+						frame := picocolors.Magenta(options.Frames[frameIndex])
 						if isCI {
 							write(fmt.Sprintf("%s %s...", frame, message))
 						} else if options.Indicator == SpinnerTimerIndicator {
@@ -124,7 +131,7 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 							duration := time.Since(startTime)
 							write(fmt.Sprintf("%s %s%s", frame, message, formatDots(duration)))
 						}
-						if frameIndex+1 < len(frames) {
+						if frameIndex+1 < len(options.Frames) {
 							frameIndex++
 						} else {
 							frameIndex = 0

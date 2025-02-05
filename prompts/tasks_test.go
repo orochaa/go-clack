@@ -15,17 +15,21 @@ func TestTasksStart(t *testing.T) {
 	startTimes := 0
 	task := func(message func(msg string)) (string, error) {
 		startTimes++
-		time.Sleep(frameInterval)
+		time.Sleep(time.Millisecond)
 		return "", nil
 	}
 	w := &MockWriter{}
 
-	prompts.Tasks([]prompts.Task{
-		{Title: "Foo", Task: task},
-		{Title: "Bar", Task: task},
-		{Title: "Baz", Task: task},
-	}, prompts.SpinnerOptions{Output: w})
-	time.Sleep(3 * frameInterval)
+	prompts.Tasks(
+		[]prompts.Task{
+			{Title: "Foo", Task: task},
+			{Title: "Bar", Task: task},
+			{Title: "Baz", Task: task},
+		}, prompts.SpinnerOptions{
+			Output:        w,
+			FrameInterval: time.Millisecond,
+		})
+	time.Sleep(5 * time.Millisecond)
 
 	expectedList := []string{
 		"◒ Foo",
@@ -41,17 +45,21 @@ func TestTasksSubmit(t *testing.T) {
 	startTimes := 0
 	task := func(message func(msg string)) (string, error) {
 		startTimes++
-		time.Sleep(frameInterval)
+		time.Sleep(time.Millisecond)
 		return "", nil
 	}
 	w := &MockWriter{}
 
-	prompts.Tasks([]prompts.Task{
-		{Title: "Foo", Task: task},
-		{Title: "Bar", Task: task},
-		{Title: "Baz", Task: task},
-	}, prompts.SpinnerOptions{Output: w})
-	time.Sleep(3 * frameInterval)
+	prompts.Tasks(
+		[]prompts.Task{
+			{Title: "Foo", Task: task},
+			{Title: "Bar", Task: task},
+			{Title: "Baz", Task: task},
+		}, prompts.SpinnerOptions{
+			Output:        w,
+			FrameInterval: time.Millisecond,
+		})
+	time.Sleep(5 * time.Millisecond)
 
 	expectedList := []string{
 		symbols.STEP_SUBMIT + " Foo\n",
@@ -73,10 +81,13 @@ func TestTasksUpdateMessage(t *testing.T) {
 
 	prompts.Tasks([]prompts.Task{
 		{Title: "Foo", Task: task},
-	}, prompts.SpinnerOptions{Output: w})
-	time.Sleep(2 * frameInterval)
+	}, prompts.SpinnerOptions{
+		Output:        w,
+		FrameInterval: time.Millisecond,
+	})
+	time.Sleep(2 * time.Millisecond)
 
-	assert.NotContains(t, w.Data, "◒ Bar")
+	assert.Contains(t, w.Data, "◒ Bar")
 }
 
 func TestTasksWithDisabledTask(t *testing.T) {
@@ -89,8 +100,11 @@ func TestTasksWithDisabledTask(t *testing.T) {
 
 	prompts.Tasks([]prompts.Task{
 		{Title: "Foo", Task: task, Disabled: true},
-	}, prompts.SpinnerOptions{Output: w})
-	time.Sleep(2 * frameInterval)
+	}, prompts.SpinnerOptions{
+		Output:        w,
+		FrameInterval: time.Millisecond,
+	})
+	time.Sleep(2 * time.Millisecond)
 
 	assert.Equal(t, 0, counter)
 }
@@ -103,8 +117,11 @@ func TestTasksTaskWithError(t *testing.T) {
 
 	prompts.Tasks([]prompts.Task{
 		{Title: "Foo", Task: task},
-	}, prompts.SpinnerOptions{Output: w})
-	time.Sleep(2 * frameInterval)
+	}, prompts.SpinnerOptions{
+		Output:        w,
+		FrameInterval: time.Millisecond,
+	})
+	time.Sleep(2 * time.Millisecond)
 
 	assert.Contains(t, w.Data, fmt.Sprintf("%s task error\n", symbols.STEP_CANCEL))
 }

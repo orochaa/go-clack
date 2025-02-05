@@ -73,13 +73,10 @@ func (m *MockTimer) ResolveAll() {
 }
 
 type MockWriter struct {
-	mu   sync.Mutex
 	Data []string
 }
 
 func (w *MockWriter) Write(data []byte) (int, error) {
-	w.mu.Lock()
 	w.Data = append(w.Data, string(data))
-	w.mu.Unlock()
 	return 0, nil
 }

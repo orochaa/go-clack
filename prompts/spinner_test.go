@@ -9,18 +9,16 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-const frameInterval = 80 * time.Millisecond
-const dotsInterval = time.Second
-
 func TestSpinnerFrameAnimation(t *testing.T) {
 	w := &MockWriter{}
 	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: w,
+		Output:        w,
+		FrameInterval: time.Millisecond,
 	})
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
-	time.Sleep(5 * frameInterval)
+	time.Sleep(5 * time.Millisecond)
 
 	assert.Contains(t, w.Data, "◒ Loading")
 	assert.Contains(t, w.Data, "◐ Loading")
@@ -36,12 +34,12 @@ func TestSpinnerDotsAnimation(t *testing.T) {
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
-	time.Sleep(4 * dotsInterval)
+	time.Sleep(4 * time.Second)
 
+	assert.Contains(t, w.Data, "◑ Loading")
 	assert.Contains(t, w.Data, "◒ Loading.")
 	assert.Contains(t, w.Data, "◐ Loading..")
 	assert.Contains(t, w.Data, "◓ Loading...")
-	assert.Contains(t, w.Data, "◑ Loading")
 }
 
 func TestSpinnerTimerAnimation(t *testing.T) {
@@ -65,12 +63,13 @@ func TestSpinnerDotsAnimationDuringCI(t *testing.T) {
 	defer os.Setenv("CI", "")
 	w := &MockWriter{}
 	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: w,
+		Output:        w,
+		FrameInterval: time.Millisecond,
 	})
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
-	time.Sleep(2 * frameInterval)
+	time.Sleep(5 * time.Millisecond)
 
 	assert.Contains(t, w.Data, "◒ Loading...")
 }
@@ -78,13 +77,14 @@ func TestSpinnerDotsAnimationDuringCI(t *testing.T) {
 func TestSpinnerRemoveDotsFromMessage(t *testing.T) {
 	w := &MockWriter{}
 	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: w,
+		Output:        w,
+		FrameInterval: time.Millisecond,
 	})
 
 	s.Start("Loading...")
 	defer s.Stop("", 0)
 
-	time.Sleep(2 * frameInterval)
+	time.Sleep(50 * time.Millisecond)
 
 	assert.Contains(t, w.Data, "◒ Loading")
 }
@@ -92,13 +92,14 @@ func TestSpinnerRemoveDotsFromMessage(t *testing.T) {
 func TestSpinnerMessageMethod(t *testing.T) {
 	w := &MockWriter{}
 	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: w,
+		Output:        w,
+		FrameInterval: time.Millisecond,
 	})
 
 	s.Start("Loading...")
 	defer s.Stop("", 0)
 	s.Message("Still Loading")
-	time.Sleep(2 * frameInterval)
+	time.Sleep(50 * time.Millisecond)
 
 	assert.Contains(t, w.Data, "◒ Still Loading")
 }
@@ -106,13 +107,14 @@ func TestSpinnerMessageMethod(t *testing.T) {
 func TestSpinnerStopMessage(t *testing.T) {
 	w := &MockWriter{}
 	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: w,
+		Output:        w,
+		FrameInterval: time.Millisecond,
 	})
 
 	s.Start("Loading...")
-	time.Sleep(2 * frameInterval)
+	time.Sleep(2 * time.Millisecond)
 	s.Stop("Loaded", 0)
-	time.Sleep(1 * frameInterval)
+	time.Sleep(1 * time.Millisecond)
 
 	assert.Contains(t, w.Data, "◇ Loaded\n")
 }
