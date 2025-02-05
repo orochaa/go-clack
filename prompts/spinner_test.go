@@ -10,22 +10,17 @@ import (
 )
 
 const frameInterval = 80 * time.Millisecond
-const dotsInterval = 8 * frameInterval
-
-func runSpinner() (*prompts.SpinnerController, *MockWriter) {
-	writer := &MockWriter{}
-	s := prompts.Spinner(prompts.SpinnerOptions{
-		Output: writer,
-	})
-	return s, writer
-}
+const dotsInterval = time.Second
 
 func TestSpinnerFrameAnimation(t *testing.T) {
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
-	time.Sleep(4 * frameInterval)
+	time.Sleep(5 * frameInterval)
 
 	assert.Contains(t, w.Data, "◒ Loading")
 	assert.Contains(t, w.Data, "◐ Loading")
@@ -34,7 +29,10 @@ func TestSpinnerFrameAnimation(t *testing.T) {
 }
 
 func TestSpinnerDotsAnimation(t *testing.T) {
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
@@ -46,10 +44,29 @@ func TestSpinnerDotsAnimation(t *testing.T) {
 	assert.Contains(t, w.Data, "◑ Loading")
 }
 
+func TestSpinnerTimerAnimation(t *testing.T) {
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output:    w,
+		Indicator: prompts.SpinnerTimerIndicator,
+	})
+
+	s.Start("Loading")
+	defer s.Stop("", 0)
+	time.Sleep(3 * time.Second)
+
+	assert.Contains(t, w.Data, "◒ Loading [0s]")
+	assert.Contains(t, w.Data, "◑ Loading [1s]")
+	assert.Contains(t, w.Data, "◒ Loading [2s]")
+}
+
 func TestSpinnerDotsAnimationDuringCI(t *testing.T) {
 	os.Setenv("CI", "true")
 	defer os.Setenv("CI", "")
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading")
 	defer s.Stop("", 0)
@@ -59,7 +76,10 @@ func TestSpinnerDotsAnimationDuringCI(t *testing.T) {
 }
 
 func TestSpinnerRemoveDotsFromMessage(t *testing.T) {
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading...")
 	defer s.Stop("", 0)
@@ -70,18 +90,24 @@ func TestSpinnerRemoveDotsFromMessage(t *testing.T) {
 }
 
 func TestSpinnerMessageMethod(t *testing.T) {
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading...")
 	defer s.Stop("", 0)
 	s.Message("Still Loading")
 	time.Sleep(2 * frameInterval)
 
-	assert.Contains(t, w.Data, "◐ Still Loading")
+	assert.Contains(t, w.Data, "◒ Still Loading")
 }
 
 func TestSpinnerStopMessage(t *testing.T) {
-	s, w := runSpinner()
+	w := &MockWriter{}
+	s := prompts.Spinner(prompts.SpinnerOptions{
+		Output: w,
+	})
 
 	s.Start("Loading...")
 	time.Sleep(2 * frameInterval)

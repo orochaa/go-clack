@@ -16,9 +16,20 @@ import (
 	"github.com/Mist3rBru/go-clack/third_party/sisteransi"
 )
 
+// SpinnerIndicator defines the type for spinner indicators.
+type SpinnerIndicator int
+
+const (
+	// SpinnerDotsIndicator shows a loading animation with dots.
+	SpinnerDotsIndicator SpinnerIndicator = iota
+	// SpinnerTimerIndicator displays a timer alongside the loading message.
+	SpinnerTimerIndicator
+)
+
 type SpinnerOptions struct {
-	Context context.Context
-	Output  io.Writer
+	Context   context.Context
+	Output    io.Writer
+	Indicator SpinnerIndicator
 }
 
 type SpinnerController struct {
@@ -39,16 +50,17 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 		options.Output = os.Stdout
 	}
 
+	var ctx context.Context
 	var ticker *time.Ticker
+	var startTime time.Time
+
+	var stopSpinner func()
 
 	var message, prevMessage string
 
 	var frames []string
 	var frameIndex int
 	var frameInterval time.Duration
-
-	const dotsInterval float32 = 0.125
-	var dotsTimer float32
 
 	if isunicodesupported.IsUnicodeSupported() {
 		frames = []string{"◒", "◐", "◓", "◑"}
@@ -58,7 +70,6 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 		frameInterval = 120 * time.Millisecond
 	}
 
-	ctx, stopSpinner := context.WithCancel(options.Context)
 	ticker = time.NewTicker(frameInterval)
 
 	isCI := os.Getenv("CI") == "true"
@@ -84,13 +95,15 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 			write(sisteransi.HideCursor())
 			write(picocolors.Gray(symbols.BAR) + "\r\n")
 
+			ctx, stopSpinner = context.WithCancel(options.Context)
+			ticker.Reset(frameInterval)
+
 			frameIndex = 0
-			dotsTimer = 0
+			startTime = time.Now()
+
 			message = parseMessage(msg)
 
 			go func() {
-				ticker.Reset(frameInterval)
-
 				for {
 					select {
 					case <-ctx.Done():
@@ -102,22 +115,19 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 						clearPrevMessage()
 						prevMessage = message
 						frame := picocolors.Magenta(frames[frameIndex])
-						var loadingDots string
 						if isCI {
-							loadingDots = "..."
+							write(fmt.Sprintf("%s %s...", frame, message))
+						} else if options.Indicator == SpinnerTimerIndicator {
+							duration := time.Since(startTime)
+							write(fmt.Sprintf("%s %s %s", frame, message, formatTimer(duration)))
 						} else {
-							loadingDots = strings.Repeat(".", min(int(dotsTimer), 3))
+							duration := time.Since(startTime)
+							write(fmt.Sprintf("%s %s%s", frame, message, formatDots(duration)))
 						}
-						write(fmt.Sprintf("%s %s%s", frame, message, loadingDots))
 						if frameIndex+1 < len(frames) {
 							frameIndex++
 						} else {
 							frameIndex = 0
-						}
-						if int(dotsTimer) < 4 {
-							dotsTimer += dotsInterval
-						} else {
-							dotsTimer = 0
 						}
 					}
 				}
@@ -150,4 +160,18 @@ func Spinner(options SpinnerOptions) *SpinnerController {
 func parseMessage(msg string) string {
 	dotsRegex := regexp.MustCompile(`\.+$`)
 	return dotsRegex.ReplaceAllString(msg, "")
+}
+
+func formatTimer(duration time.Duration) string {
+	min := int(duration.Minutes())
+	secs := int(duration.Seconds()) - (min * 60)
+	if min > 0 {
+		return fmt.Sprintf("[%dm %ds]", min, secs)
+	}
+	return fmt.Sprintf("[%ds]", secs)
+}
+
+func formatDots(duration time.Duration) string {
+	dotsCounter := int(duration.Seconds()) % 4
+	return strings.Repeat(".", dotsCounter)
 }

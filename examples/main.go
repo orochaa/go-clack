@@ -20,6 +20,7 @@ func main() {
 			{Label: "basic"},
 			{Label: "changeset"},
 			{Label: "spinner"},
+			{Label: "spinner-timer"},
 			{Label: "spinner-ci"},
 			{Label: "async-validation"},
 			{Label: "file-selection"},
@@ -38,6 +39,8 @@ func main() {
 		ChangesetExample()
 	case "spinner":
 		SpinnerExample()
+	case "spinner-timer":
+		SpinnerTimerExample()
 	case "spinner-ci":
 		os.Setenv("CI", "true")
 		SpinnerCIExample()
