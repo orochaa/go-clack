@@ -4,7 +4,7 @@ import (
 	"errors"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/prompts"
+	"github.com/orochaa/go-clack/prompts"
 )
 
 func AsyncValidation() {

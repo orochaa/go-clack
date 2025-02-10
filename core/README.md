@@ -40,7 +40,7 @@ To start using `go-clack/core`, follow these steps:
 First, add the `go-clack/core` package to your Go project:
 
 ```bash
-go get github.com/Mist3rBru/go-clack/core
+go get github.com/orochaa/go-clack/core
 ```
 
 ### 2. Create a Prompt
@@ -54,7 +54,7 @@ package main
 import (
   "fmt"
   "os"
-  "github.com/Mist3rBru/go-clack/core"
+  "github.com/orochaa/go-clack/core"
 )
 
 func main() {

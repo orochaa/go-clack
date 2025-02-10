@@ -2,11 +2,11 @@
 
 Effortlessly build beautiful command-line apps 🪄 [Try the demo](https://stackblitz.com/edit/clack-prompts?file=index.js)
 
-![clack-prompt](https://github.com/Mist3rBru/go-clack/blob/master/.github/assets/clack-demo.gif)
+![clack-prompt](https://github.com/orochaa/go-clack/blob/master/.github/assets/clack-demo.gif)
 
 ---
 
-`go-clack/prompts` is an opinionated, pre-styled wrapper around [`go-clack/core`](https://github.com/Mist3rBru/go-clack/blob/master/core/README.md).
+`go-clack/prompts` is an opinionated, pre-styled wrapper around [`go-clack/core`](https://github.com/orochaa/go-clack/blob/master/core/README.md).
 
 - 💎 Beautiful, minimal UI
 - ✅ Simple API
@@ -21,7 +21,7 @@ To start using `go-clack/prompts`, follow these steps:
 Add the `go-clack/prompts` package to your Go project:
 
 ```bash
-go get github.com/Mist3rBru/go-clack/prompts
+go get github.com/orochaa/go-clack/prompts
 ```
 
 ### 2. Create a Prompt
@@ -33,7 +33,7 @@ To create and run a simple text prompt, you can use the following code:
 package main
 
 import (
-  "github.com/Mist3rBru/go-clack/prompts"
+  "github.com/orochaa/go-clack/prompts"
 )
 
 func main() {

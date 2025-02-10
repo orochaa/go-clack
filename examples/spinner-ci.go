@@ -15,7 +15,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/prompts"
+	"github.com/orochaa/go-clack/prompts"
 )
 
 func SpinnerCIExample() {

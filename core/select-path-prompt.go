@@ -5,9 +5,9 @@ import (
 	"os"
 	"path"
 
-	"github.com/Mist3rBru/go-clack/core/internals"
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/core/validator"
+	"github.com/orochaa/go-clack/core/internals"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/core/validator"
 )
 
 type SelectPathPrompt struct {

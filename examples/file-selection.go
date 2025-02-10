@@ -1,6 +1,6 @@
 package main
 
-import "github.com/Mist3rBru/go-clack/prompts"
+import "github.com/orochaa/go-clack/prompts"
 
 func FileSelection() {
 	prompts.Path(prompts.PathParams{

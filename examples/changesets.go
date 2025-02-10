@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/Mist3rBru/go-clack/prompts"
-	"github.com/Mist3rBru/go-clack/third_party/picocolors"
+	"github.com/orochaa/go-clack/prompts"
+	"github.com/orochaa/go-clack/third_party/picocolors"
 )
 
 func ChangesetExample() {

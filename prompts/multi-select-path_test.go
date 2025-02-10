@@ -4,10 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/prompts"
-	"github.com/Mist3rBru/go-clack/prompts/test"
 	"github.com/bradleyjkemp/cupaloy"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/prompts"
+	"github.com/orochaa/go-clack/prompts/test"
 	"github.com/stretchr/testify/assert"
 )
 

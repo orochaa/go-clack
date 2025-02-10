@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/prompts"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/prompts"
 )
 
 func CustomKeys() {

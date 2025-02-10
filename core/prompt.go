@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/core/validator"
-	"github.com/Mist3rBru/go-clack/third_party/sisteransi"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/core/validator"
+	"github.com/orochaa/go-clack/third_party/sisteransi"
 
 	"golang.org/x/term"
 )

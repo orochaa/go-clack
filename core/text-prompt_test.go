@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/third_party/picocolors"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/third_party/picocolors"
 
 	"github.com/stretchr/testify/assert"
 )

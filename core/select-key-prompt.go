@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	"github.com/Mist3rBru/go-clack/core/validator"
+	"github.com/orochaa/go-clack/core/validator"
 )
 
 type SelectKeyOption[TValue any] struct {

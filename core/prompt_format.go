@@ -4,8 +4,8 @@ import (
 	"math"
 	"strings"
 
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/third_party/picocolors"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/third_party/picocolors"
 )
 
 // TrackKeyValue updates the string value and cursor position based on key presses.

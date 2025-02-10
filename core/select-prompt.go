@@ -5,8 +5,8 @@ import (
 	"os"
 	"regexp"
 
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/core/validator"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/core/validator"
 )
 
 type SelectOption[TValue comparable] struct {

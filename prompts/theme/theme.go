@@ -3,10 +3,10 @@ package theme
 import (
 	"strings"
 
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/prompts/symbols"
-	"github.com/Mist3rBru/go-clack/third_party/picocolors"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/prompts/symbols"
+	"github.com/orochaa/go-clack/third_party/picocolors"
 )
 
 type ThemeValue interface {

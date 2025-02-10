@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Mist3rBru/go-clack/core"
+	"github.com/orochaa/go-clack/core"
 	"github.com/stretchr/testify/assert"
 )
 

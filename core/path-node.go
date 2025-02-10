@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Mist3rBru/go-clack/core/internals"
+	"github.com/orochaa/go-clack/core/internals"
 )
 
 type PathNode struct {

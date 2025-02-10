@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/core/utils"
-	"github.com/Mist3rBru/go-clack/prompts/symbols"
-	isunicodesupported "github.com/Mist3rBru/go-clack/third_party/is-unicode-supported"
-	"github.com/Mist3rBru/go-clack/third_party/picocolors"
-	"github.com/Mist3rBru/go-clack/third_party/sisteransi"
+	"github.com/orochaa/go-clack/core/utils"
+	"github.com/orochaa/go-clack/prompts/symbols"
+	isunicodesupported "github.com/orochaa/go-clack/third_party/is-unicode-supported"
+	"github.com/orochaa/go-clack/third_party/picocolors"
+	"github.com/orochaa/go-clack/third_party/sisteransi"
 )
 
 // SpinnerIndicator defines the type for spinner indicators.

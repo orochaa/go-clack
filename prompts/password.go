@@ -4,9 +4,9 @@ import (
 	"context"
 	"os"
 
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/prompts/test"
-	"github.com/Mist3rBru/go-clack/prompts/theme"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/prompts/test"
+	"github.com/orochaa/go-clack/prompts/theme"
 )
 
 type PasswordParams struct {

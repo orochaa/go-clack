@@ -3,7 +3,7 @@ package core_test
 import (
 	"testing"
 
-	"github.com/Mist3rBru/go-clack/core"
+	"github.com/orochaa/go-clack/core"
 	"github.com/stretchr/testify/assert"
 )
 

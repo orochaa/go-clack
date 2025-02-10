@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/prompts"
-	"github.com/Mist3rBru/go-clack/prompts/symbols"
+	"github.com/orochaa/go-clack/prompts"
+	"github.com/orochaa/go-clack/prompts/symbols"
 	"github.com/stretchr/testify/assert"
 )
 

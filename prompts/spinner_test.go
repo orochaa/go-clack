@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/prompts"
+	"github.com/orochaa/go-clack/prompts"
 	"github.com/stretchr/testify/assert"
 )
 

@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Mist3rBru/go-clack/core"
-	"github.com/Mist3rBru/go-clack/prompts/symbols"
-	"github.com/Mist3rBru/go-clack/prompts/theme"
+	"github.com/orochaa/go-clack/core"
+	"github.com/orochaa/go-clack/prompts/symbols"
+	"github.com/orochaa/go-clack/prompts/theme"
 	"github.com/stretchr/testify/assert"
 )
 

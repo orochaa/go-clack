@@ -1,8 +1,8 @@
 package symbols
 
 import (
-	"github.com/Mist3rBru/go-clack/core"
-	isunicodesupported "github.com/Mist3rBru/go-clack/third_party/is-unicode-supported"
+	"github.com/orochaa/go-clack/core"
+	isunicodesupported "github.com/orochaa/go-clack/third_party/is-unicode-supported"
 )
 
 func s(c, fallback string) string {
