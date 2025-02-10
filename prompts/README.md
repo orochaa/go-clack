@@ -258,7 +258,6 @@ Execute multiple tasks in spinners.
 
 ```go
 prompts.Tasks(
-  context.Background(),
   []prompts.Task{
     {
       Title: "Installing via npm",
@@ -271,3 +270,23 @@ prompts.Tasks(
   prompts.SpinnerOptions{}
 )
 ```
+
+### Logs
+
+```go
+prompts.Info("Info!")
+prompts.Success("Success!")
+prompts.Step("Step!")
+prompts.Warn("Warn!")
+prompts.Error("Error!")
+prompts.Message("Hello, World", prompts.MessageOptions{
+  FirstLine: prompts.MessageLineOptions{
+    Start: picocolors.Cyan("~"),
+  },
+  Default: prompts.MessageLineOptions{
+    Start: picocolors.Gray(symbols.BAR),
+  },
+})
+```
+
+[clack-log-prompts](https://github.com/orochaa/go-clack/blob/master/.github/assets/clack-logs.png)
