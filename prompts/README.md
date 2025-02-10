@@ -289,4 +289,4 @@ prompts.Message("Hello, World", prompts.MessageOptions{
 })
 ```
 
-[clack-log-prompts](https://github.com/orochaa/go-clack/blob/master/.github/assets/clack-logs.png)
+![clack-log-prompts](https://github.com/orochaa/go-clack/blob/master/.github/assets/clack-logs.png)
