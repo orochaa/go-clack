@@ -64,7 +64,14 @@ func NewTextPrompt(params TextPromptParams) *TextPrompt {
 	}
 
 	p.On(KeyEvent, func(args ...any) {
-		p.handleKeyPress(args[0].(*Key))
+		key := args[0].(*Key)
+
+		if key.Name == EnterKey && p.Value == "" && p.Placeholder != "" {
+			p.Value = p.Placeholder
+			return
+		}
+
+		p.handleKeyPress(key)
 	})
 
 	return &p
