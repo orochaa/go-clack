@@ -12,6 +12,7 @@ import (
 type MultiSelectOption[TValue comparable] struct {
 	Label      string
 	Value      TValue
+	Hint       string
 	IsSelected bool
 }
 

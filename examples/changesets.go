@@ -65,6 +65,10 @@ func ChangesetExample() {
 				})
 			}
 
+			if len(minorOptions) == 0 {
+				return []string(nil), nil
+			}
+
 			return prompts.MultiSelect(prompts.MultiSelectParams[string]{
 				Message: fmt.Sprintf("Which packages should have a %s bump?", picocolors.Yellow("minor")),
 				Options: minorOptions,

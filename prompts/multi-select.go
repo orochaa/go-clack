@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/orochaa/go-clack/core"
 	"github.com/orochaa/go-clack/core/validator"
@@ -65,6 +64,7 @@ func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue,
 		options = append(options, &core.MultiSelectOption[TValue]{
 			Label:      option.Label,
 			Value:      option.Value,
+			Hint:       option.Hint,
 			IsSelected: option.IsSelected,
 		})
 	}
@@ -101,23 +101,26 @@ func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue,
 					if option.IsSelected && i == p.CursorIndex {
 						radio = picocolors.Green(symbols.CHECKBOX_SELECTED)
 						label = option.Label
-						if params.Options[i].Hint != "" {
-							hint = picocolors.Dim("(" + params.Options[i].Hint + ")")
+						if option.Hint != "" {
+							hint = picocolors.Dim("(" + option.Hint + ")")
 						}
 					} else if i == p.CursorIndex {
 						radio = picocolors.Green(symbols.CHECKBOX_ACTIVE)
 						label = option.Label
-						if params.Options[i].Hint != "" {
-							hint = picocolors.Dim("(" + params.Options[i].Hint + ")")
+						if option.Hint != "" {
+							hint = picocolors.Dim("(" + option.Hint + ")")
 						}
 					} else if option.IsSelected {
 						radio = picocolors.Green(symbols.CHECKBOX_SELECTED)
 						label = picocolors.Dim(option.Label)
+						if option.Hint != "" {
+							hint = picocolors.Dim("(" + option.Hint + ")")
+						}
 					} else {
 						radio = picocolors.Dim(symbols.CHECKBOX_INACTIVE)
 						label = picocolors.Dim(option.Label)
 					}
-					radioOptions[i] = strings.Join([]string{radio, label, hint}, " ")
+					radioOptions[i] = radio + " " + label + " " + hint
 				}
 
 				if p.Filter {

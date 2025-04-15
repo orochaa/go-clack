@@ -62,6 +62,7 @@ func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) 
 			groups[group][i] = core.MultiSelectOption[TValue]{
 				Label:      option.Label,
 				Value:      option.Value,
+				Hint:       option.Hint,
 				IsSelected: option.IsSelected,
 			}
 		}
@@ -120,17 +121,26 @@ func GroupMultiSelect[TValue comparable](params GroupMultiSelectParams[TValue]) 
 }
 
 func groupOption[TValue comparable](option *core.GroupMultiSelectOption[TValue], isSelected, isActive, isDisabled bool) string {
-	var radio, label string
+	var radio, label, hint string
 
 	if isSelected && isActive {
 		radio = picocolors.Green(symbols.CHECKBOX_SELECTED)
 		label = option.Label
+		if option.Hint != "" {
+			hint = picocolors.Dim("(" + option.Hint + ")")
+		}
 	} else if isActive {
 		radio = picocolors.Green(symbols.CHECKBOX_ACTIVE)
 		label = option.Label
+		if option.Hint != "" {
+			hint = picocolors.Dim("(" + option.Hint + ")")
+		}
 	} else if isSelected {
 		radio = picocolors.Green(symbols.CHECKBOX_SELECTED)
 		label = picocolors.Dim(option.Label)
+		if option.Hint != "" {
+			hint = picocolors.Dim("(" + option.Hint + ")")
+		}
 	} else {
 		radio = picocolors.Dim(symbols.CHECKBOX_INACTIVE)
 		label = picocolors.Dim(option.Label)
@@ -140,5 +150,5 @@ func groupOption[TValue comparable](option *core.GroupMultiSelectOption[TValue],
 		return label
 	}
 
-	return radio + " " + label
+	return radio + " " + label + " " + hint
 }
