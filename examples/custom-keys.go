@@ -6,7 +6,7 @@ import (
 )
 
 func CustomKeys() {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,

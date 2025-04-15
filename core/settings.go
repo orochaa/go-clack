@@ -15,35 +15,59 @@ const (
 	CancelAction
 )
 
-// aliases is a map that associates KeyName values with their corresponding Action.
-// It defines default key bindings for actions in the application.
-// Within any new alias coming from the user's land
-var aliases = map[KeyName]Action{
-	UpKey:     UpAction,
-	DownKey:   DownAction,
-	LeftKey:   LeftAction,
-	RightKey:  RightAction,
-	HomeKey:   HomeAction,
-	EndKey:    EndAction,
-	SpaceKey:  SpaceAction,
-	EnterKey:  SubmitAction,
-	CancelKey: CancelAction,
-	EscapeKey: CancelAction,
+// Custom messages for prompts
+type SettingsMessages struct {
+	// Custom message to display when a spinner is cancelled (default: "Canceled").
+	CancelMessage string
+	// Custom message to display when a spinner encounters an error (default: "Something went wrong").
+	ErrorMessage string
 }
 
-// Settings defines user-configurable settings for the application.
-type Settings struct {
-	// Aliases is a map of custom key bindings for actions.
+// SettingsOptions defines user-configurable Settings for the application.
+type SettingsOptions struct {
+	// Aliases are custom key bindings for actions.
 	// If a key binding already exists in the aliases map, it is not overwritten.
 	Aliases map[KeyName]Action
+	// Messages contains custom messages for the application.
+	Messages SettingsMessages
 }
 
-// UpdateSettings updates the global Settings for the application.
-func UpdateSettings(settings Settings) {
-	for alias, action := range settings.Aliases {
-		if _, exists := aliases[alias]; !exists {
-			aliases[alias] = action
+var Settings = SettingsOptions{
+	// aliases is a map that associates KeyName values with their corresponding Action.
+	// It defines default key bindings for actions in the application.
+	// Within any new alias coming from the user's land
+	Aliases: map[KeyName]Action{
+		UpKey:     UpAction,
+		DownKey:   DownAction,
+		LeftKey:   LeftAction,
+		RightKey:  RightAction,
+		HomeKey:   HomeAction,
+		EndKey:    EndAction,
+		SpaceKey:  SpaceAction,
+		EnterKey:  SubmitAction,
+		CancelKey: CancelAction,
+		EscapeKey: CancelAction,
+	},
+	// Messages contains default messages for the application.
+	Messages: SettingsMessages{
+		CancelMessage: "Canceled",
+		ErrorMessage:  "Something went wrong",
+	},
+}
+
+// UpdateSettings updates the global SettingsOptions for the application.
+func UpdateSettings(updates SettingsOptions) {
+	for alias, action := range updates.Aliases {
+		if _, exists := Settings.Aliases[alias]; !exists {
+			Settings.Aliases[alias] = action
 		}
+	}
+
+	if updates.Messages.CancelMessage != "" {
+		Settings.Messages.CancelMessage = updates.Messages.CancelMessage
+	}
+	if updates.Messages.ErrorMessage != "" {
+		Settings.Messages.ErrorMessage = updates.Messages.ErrorMessage
 	}
 }
 
@@ -59,7 +83,7 @@ func UpdateSettings(settings Settings) {
 //   - actionHandler (func(key *Key)): A action handler that handles key events and invokes the appropriate listener.
 func NewActionHandler(listeners map[Action]func(), defaultListener func(key *Key)) (actionHandler func(key *Key)) {
 	return func(key *Key) {
-		if action, actionExists := aliases[key.Name]; actionExists {
+		if action, actionExists := Settings.Aliases[key.Name]; actionExists {
 			if listener, listenerExists := listeners[action]; listenerExists {
 				if listener != nil {
 					listener()

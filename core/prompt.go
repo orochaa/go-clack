@@ -197,7 +197,7 @@ func (p *Prompt[TValue]) PressKey(key *Key) {
 
 	p.Emit(KeyEvent, key)
 
-	if action, actionExists := aliases[key.Name]; actionExists {
+	if action, actionExists := Settings.Aliases[key.Name]; actionExists {
 		if action == SubmitAction {
 			if err := p.validate(); err != nil {
 				p.State = ErrorState

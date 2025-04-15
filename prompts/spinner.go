@@ -11,6 +11,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/orochaa/go-clack/core"
 	"github.com/orochaa/go-clack/core/utils"
 	"github.com/orochaa/go-clack/prompts/symbols"
 	isunicodesupported "github.com/orochaa/go-clack/third_party/is-unicode-supported"
@@ -37,6 +38,8 @@ type SpinnerOptions struct {
 	Frames        []string
 	FrameInterval time.Duration
 	OnCancel      func()
+	CancelMessage string
+	ErrorMessage  string
 }
 
 type SpinnerController struct {
@@ -129,19 +132,28 @@ func (s *SpinnerController) Start(msg string) {
 				s.ticker.Stop()
 				return
 			case sig := <-cancel:
-				var cancelMsg string
 				switch sig {
 				case syscall.SIGTERM, syscall.SIGINT:
-					cancelMsg = "Cancelled"
 					s.IsCancelled = true
+					var cancelMsg string
+					if s.options.CancelMessage != "" {
+						cancelMsg = s.options.CancelMessage
+					} else {
+						cancelMsg = core.Settings.Messages.CancelMessage
+					}
+					s.Stop(cancelMsg, 1)
+					if s.options.OnCancel != nil {
+						s.options.OnCancel()
+					}
 				default:
-					cancelMsg = "Something went wrong"
+					var errorMsg string
+					if s.options.ErrorMessage != "" {
+						errorMsg = s.options.ErrorMessage
+					} else {
+						errorMsg = core.Settings.Messages.ErrorMessage
+					}
+					s.Stop(errorMsg, 2)
 				}
-				s.Stop(cancelMsg, 1)
-				if s.IsCancelled {
-					s.options.OnCancel()
-				}
-				os.Exit(0)
 			case <-s.ticker.C:
 				if s.isCI && s.message == prevMessage {
 					continue

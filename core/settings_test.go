@@ -8,7 +8,7 @@ import (
 )
 
 func TestTriggerActionWithKeyAlias(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,
@@ -26,7 +26,7 @@ func TestTriggerActionWithKeyAlias(t *testing.T) {
 }
 
 func TestTriggerDefaultAction(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,
@@ -46,7 +46,7 @@ func TestTriggerDefaultAction(t *testing.T) {
 }
 
 func TestTriggerNoAction(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,
@@ -61,7 +61,7 @@ func TestTriggerNoAction(t *testing.T) {
 }
 
 func TestTriggerAliasActionOverDefaultAction(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,
@@ -79,7 +79,7 @@ func TestTriggerAliasActionOverDefaultAction(t *testing.T) {
 }
 
 func TestTriggerIgnoredActionOverDefaultAction(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			"k": core.UpAction,
 			"j": core.DownAction,
@@ -94,7 +94,7 @@ func TestTriggerIgnoredActionOverDefaultAction(t *testing.T) {
 }
 
 func TestTriggerActionWithInternalKeyAlias(t *testing.T) {
-	core.UpdateSettings(core.Settings{
+	core.UpdateSettings(core.SettingsOptions{
 		Aliases: map[core.KeyName]core.Action{
 			core.UpKey: core.DownAction,
 		},
