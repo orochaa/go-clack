@@ -12,12 +12,23 @@ import (
 )
 
 type MessageLineOptions = core.FormatLineOptions
-type MessageOptions = core.FormatLinesOptions
+
+type LogOptions struct {
+	Output *os.File
+}
+
+type MessageOptions struct {
+	LogOptions
+	core.FormatLinesOptions
+}
 
 func Message(msg string, options MessageOptions) {
+	if options.Output == nil {
+		options.Output = os.Stdout
+	}
 	p := &core.Prompt[string]{}
-	formattedMsg := p.FormatLines(utils.SplitLines(msg), options)
-	os.Stdout.WriteString(fmt.Sprintf("%s\r\n%s\r\n", picocolors.Gray(symbols.BAR), formattedMsg))
+	formattedMsg := p.FormatLines(utils.SplitLines(msg), options.FormatLinesOptions)
+	options.Output.WriteString(fmt.Sprintf("%s\r\n%s\r\n", picocolors.Gray(symbols.BAR), formattedMsg))
 }
 
 func styleMsg(msg string, style func(msg string) string) string {
@@ -30,9 +41,9 @@ func styleMsg(msg string, style func(msg string) string) string {
 }
 
 // Intro displays an introductory message.
-func Intro(msg string) {
+func Intro(msg string, options LogOptions) {
 	p := &core.Prompt[string]{}
-	formattedMsg := p.FormatLines(utils.SplitLines(msg), MessageOptions{
+	formattedMsg := p.FormatLines(utils.SplitLines(msg), core.FormatLinesOptions{
 		FirstLine: MessageLineOptions{
 			Start: picocolors.Gray(symbols.BAR_START),
 		},
@@ -44,85 +55,100 @@ func Intro(msg string) {
 }
 
 // Cancel displays a cancellation message styled in red.
-func Cancel(msg string) {
+func Cancel(msg string, options LogOptions) {
 	Message(styleMsg(msg, picocolors.Red), MessageOptions{
-		Default: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
-		},
-		LastLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR_END),
+		LogOptions: options,
+		FormatLinesOptions: core.FormatLinesOptions{
+			Default: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
+			LastLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR_END),
+			},
 		},
 	})
 }
 
 // Outro displays a closing message.
-func Outro(msg string) {
+func Outro(msg string, options LogOptions) {
 	Message("\r\n"+msg, MessageOptions{
-		Default: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
-		},
-		LastLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR_END),
+		FormatLinesOptions: core.FormatLinesOptions{
+			Default: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
+			LastLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR_END),
+			},
 		},
 	})
 }
 
 // Info displays an informational message with a blue info symbol.
-func Info(msg string) {
+func Info(msg string, options LogOptions) {
 	Message(msg, MessageOptions{
-		FirstLine: MessageLineOptions{
-			Start: picocolors.Blue(symbols.INFO),
-		},
-		NewLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
+		FormatLinesOptions: core.FormatLinesOptions{
+			FirstLine: MessageLineOptions{
+				Start: picocolors.Blue(symbols.INFO),
+			},
+			NewLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
 		},
 	})
 }
 
 // Success displays a success message with a green success symbol.
-func Success(msg string) {
+func Success(msg string, options LogOptions) {
 	Message(msg, MessageOptions{
-		FirstLine: MessageLineOptions{
-			Start: picocolors.Green(symbols.SUCCESS),
-		},
-		NewLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
+		FormatLinesOptions: core.FormatLinesOptions{
+			FirstLine: MessageLineOptions{
+				Start: picocolors.Green(symbols.SUCCESS),
+			},
+			NewLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
 		},
 	})
 }
 
 // Step displays a step message with a green step symbol.
-func Step(msg string) {
+func Step(msg string, options LogOptions) {
 	Message(msg, MessageOptions{
-		FirstLine: MessageLineOptions{
-			Start: picocolors.Green(symbols.STEP_SUBMIT),
-		},
-		NewLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
+		FormatLinesOptions: core.FormatLinesOptions{
+			FirstLine: MessageLineOptions{
+				Start: picocolors.Green(symbols.STEP_SUBMIT),
+			},
+			NewLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
 		},
 	})
 }
 
 // Warn displays a warning message with a yellow warning symbol.
-func Warn(msg string) {
+func Warn(msg string, options LogOptions) {
 	Message(msg, MessageOptions{
-		FirstLine: MessageLineOptions{
-			Start: picocolors.Yellow(symbols.WARN),
-		},
-		NewLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
+		FormatLinesOptions: core.FormatLinesOptions{
+			FirstLine: MessageLineOptions{
+				Start: picocolors.Yellow(symbols.WARN),
+			},
+			NewLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
 		},
 	})
 }
 
 // Error displays an error message with a red error symbol.
-func Error(msg string) {
+func Error(msg string, options LogOptions) {
 	Message(msg, MessageOptions{
-		FirstLine: MessageLineOptions{
-			Start: picocolors.Red(symbols.ERROR),
-		},
-		NewLine: MessageLineOptions{
-			Start: picocolors.Gray(symbols.BAR),
+		FormatLinesOptions: core.FormatLinesOptions{
+			FirstLine: MessageLineOptions{
+				Start: picocolors.Red(symbols.ERROR),
+			},
+			NewLine: MessageLineOptions{
+				Start: picocolors.Gray(symbols.BAR),
+			},
 		},
 	})
 }
