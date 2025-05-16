@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"regexp"
 
@@ -12,6 +13,18 @@ import (
 type SelectOption[TValue comparable] struct {
 	Label string
 	Value TValue
+}
+
+func (o *SelectOption[TValue]) String() string {
+	if o == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf(
+		"{Label:%s, Value:%v(%T)}",
+		o.Label,
+		o.Value, o.Value,
+	)
 }
 
 type SelectPrompt[TValue comparable] struct {

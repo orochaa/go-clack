@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"regexp"
 
@@ -14,6 +15,20 @@ type MultiSelectOption[TValue comparable] struct {
 	Value      TValue
 	Hint       string
 	IsSelected bool
+}
+
+func (o *MultiSelectOption[TValue]) String() string {
+	if o == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf(
+		"{Label:%s, Value:%v(%T), Hint:%s, IsSelected:%t}",
+		o.Label,
+		o.Value, o.Value,
+		o.Hint,
+		o.IsSelected,
+	)
 }
 
 type MultiSelectPrompt[TValue comparable] struct {

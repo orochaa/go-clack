@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/orochaa/go-clack/core/validator"
@@ -11,6 +12,19 @@ type SelectKeyOption[TValue any] struct {
 	Label string
 	Value TValue
 	Key   string
+}
+
+func (o *SelectKeyOption[TValue]) String() string {
+	if o == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf(
+		"{Label:%s, Value:%v(%T), Key:%s}",
+		o.Label,
+		o.Value, o.Value,
+		o.Key,
+	)
 }
 
 type SelectKeyPrompt[TValue any] struct {

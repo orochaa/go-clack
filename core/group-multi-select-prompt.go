@@ -2,6 +2,7 @@ package core
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/orochaa/go-clack/core/utils"
@@ -12,6 +13,22 @@ type GroupMultiSelectOption[TValue comparable] struct {
 	MultiSelectOption[TValue]
 	IsGroup bool
 	Options []*GroupMultiSelectOption[TValue]
+}
+
+func (o *GroupMultiSelectOption[TValue]) String() string {
+	if o == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf(
+		"{Label:%s, Value:%v(%T), Hint:%s, IsSelected:%t, IsGroup:%t, Options:%d}",
+		o.Label,
+		o.Value, o.Value,
+		o.Hint,
+		o.IsSelected,
+		o.IsGroup,
+		len(o.Options),
+	)
 }
 
 type GroupMultiSelectPrompt[TValue comparable] struct {

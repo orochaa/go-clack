@@ -1,6 +1,7 @@
 package core
 
 import (
+	"fmt"
 	"path"
 	"regexp"
 	"sort"
@@ -24,6 +25,23 @@ type PathNode struct {
 
 	FileSystem  FileSystem
 	OnlyShowDir bool
+}
+
+func (n *PathNode) String() string {
+	if n == nil {
+		return "<nil>"
+	}
+
+	return fmt.Sprintf(
+		"{Index:%d, Depth:%d, Name:%q, IsDir:%t, IsOpen:%t, Children:%d, IsSelected:%t}",
+		n.Index,
+		n.Depth,
+		n.Name,
+		n.IsDir,
+		n.IsOpen,
+		len(n.Children),
+		n.IsSelected,
+	)
 }
 
 type PathNodeOptions struct {
