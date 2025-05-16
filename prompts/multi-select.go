@@ -16,8 +16,8 @@ import (
 type MultiSelectOption[TValue comparable] struct {
 	Label      string
 	Value      TValue
-	IsSelected bool
 	Hint       string
+	IsSelected bool
 }
 
 type MultiSelectParams[TValue comparable] struct {
@@ -59,14 +59,14 @@ func MultiSelect[TValue comparable](params MultiSelectParams[TValue]) ([]TValue,
 	v := validator.NewValidator("MultiSelect")
 	v.ValidateOptions(len(params.Options))
 
-	var options []*core.MultiSelectOption[TValue]
-	for _, option := range params.Options {
-		options = append(options, &core.MultiSelectOption[TValue]{
+	options := make([]*core.MultiSelectOption[TValue], len(params.Options))
+	for i, option := range params.Options {
+		options[i] = &core.MultiSelectOption[TValue]{
 			Label:      option.Label,
 			Value:      option.Value,
 			Hint:       option.Hint,
 			IsSelected: option.IsSelected,
-		})
+		}
 	}
 
 	p := core.NewMultiSelectPrompt(core.MultiSelectPromptParams[TValue]{

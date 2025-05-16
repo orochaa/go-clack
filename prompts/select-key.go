@@ -48,13 +48,13 @@ func SelectKey[TValue comparable](params SelectKeyParams[TValue]) (TValue, error
 	v := validator.NewValidator("SelectKey")
 	v.ValidateOptions(len(params.Options))
 
-	var options []*core.SelectKeyOption[TValue]
-	for _, option := range params.Options {
-		options = append(options, &core.SelectKeyOption[TValue]{
+	options := make([]*core.SelectKeyOption[TValue], len(params.Options))
+	for i, option := range params.Options {
+		options[i] = &core.SelectKeyOption[TValue]{
 			Label: option.Label,
 			Value: option.Value,
 			Key:   option.Key,
-		})
+		}
 	}
 
 	p := core.NewSelectKeyPrompt(core.SelectKeyPromptParams[TValue]{

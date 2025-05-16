@@ -56,12 +56,12 @@ func Select[TValue comparable](params SelectParams[TValue]) (TValue, error) {
 	v := validator.NewValidator("Select")
 	v.ValidateOptions(len(params.Options))
 
-	var options []*core.SelectOption[TValue]
-	for _, option := range params.Options {
-		options = append(options, &core.SelectOption[TValue]{
+	options := make([]*core.SelectOption[TValue], len(params.Options))
+	for i, option := range params.Options {
+		options[i] = &core.SelectOption[TValue]{
 			Label: option.Label,
 			Value: option.Value,
-		})
+		}
 	}
 
 	p := core.NewSelectPrompt(core.SelectPromptParams[TValue]{
