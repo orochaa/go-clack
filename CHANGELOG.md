@@ -1,4 +1,12 @@
 
+<a name="v0.1.20"></a>
+## [v0.1.20](https://github.com/orochaa/go-clack/compare/0.1.20...v0.1.20) (2025-12-14)
+
+### 📖 Documentation
+
+* update changelog
+
+
 <a name="0.1.20"></a>
 ## [0.1.20](https://github.com/orochaa/go-clack/compare/0.1.19...0.1.20) (2025-12-14)
 
