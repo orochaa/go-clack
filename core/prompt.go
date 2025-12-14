@@ -304,8 +304,10 @@ func (p *Prompt[TValue]) render() {
 
 // Run runs the prompt and processes input.
 func (p *Prompt[TValue]) Run() (TValue, error) {
+	var oldState *term.State
 	if flag.Lookup("test.v") == nil {
-		oldState, err := term.MakeRaw(int(p.input.Fd()))
+		var err error
+		oldState, err = term.MakeRaw(int(p.input.Fd()))
 		if err != nil {
 			return p.Value, err
 		}
@@ -328,6 +330,10 @@ func (p *Prompt[TValue]) Run() (TValue, error) {
 		case <-done:
 			return
 		case <-p.context.Done():
+			// Restore terminal immediately when context is cancelled
+			if oldState != nil {
+				term.Restore(int(p.input.Fd()), oldState)
+			}
 			p.PressKey(&Key{Name: CancelKey})
 		}
 	}()
@@ -341,6 +347,12 @@ outer:
 			r, size, err := p.rl.ReadRune()
 			if err != nil || size == 0 || p.IsValidating {
 				continue
+			}
+			// Check if cancelled while we were blocked on ReadRune
+			select {
+			case <-done:
+				break outer
+			default:
 			}
 			key := p.ParseKey(r)
 			p.PressKey(key)
